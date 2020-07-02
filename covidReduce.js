@@ -1,6 +1,8 @@
 
 function onLoad() {
     updateRadios();
+    displayData('cases');
+    displayData('deaths');
 }
 
 var selected = {
@@ -19,22 +21,28 @@ function updateRadios() {
     var el = document.getElementById('countries');
     el.innerHTML = '';
     var firstChar = -1;
-    var divBegin = '<div style="float: left;">';
-    var alphaDiv = divBegin;
+    var divBegin = '<div style="float: left;" onmouseleave="onLeaveCountry(this)" onmouseenter="onEnterCountry(this)">';
+    var alphaDiv = '';
+    var divStyled = '<div style="display:none; position: absolute; top: 20px; z-index: 1; background-color: rgb(245,245,255);">';
     keys.forEach(function(key){
         selection[key]=  (key === 'US');
         var checked = selection[key] ? 'checked' : '';
 
         var cd = dataSet[key];
         var curFirst = cd.name.toLowerCase().charCodeAt(0);
-        if (firstChar === -1)
+        if (firstChar === -1) {
             firstChar = curFirst;
-        else if (curFirst !== firstChar) {
-            if (alphaDiv !== divBegin) {
-                el.innerHTML += alphaDiv + '</div>';
-                alphaDiv = divBegin;
-            }
+            alphaDiv = divBegin;
+            alphaDiv += String.fromCharCode(firstChar).toUpperCase() + '&nbsp;';
+            alphaDiv += divStyled;
+        } else if (curFirst !== firstChar) {
             firstChar++;
+            if (alphaDiv !== divBegin) {
+                el.innerHTML += alphaDiv + '</div></div>';
+                alphaDiv = divBegin;
+                alphaDiv += String.fromCharCode(firstChar).toUpperCase() + '&nbsp;';
+                alphaDiv += divStyled;
+            }
         }
 
         alphaDiv += '<div>';
@@ -46,6 +54,16 @@ function updateRadios() {
     if (alphaDiv !== divBegin) {
         el.innerHTML += alphaDiv + '</div>';
     }
+}
+
+function onEnterCountry(el) {
+    var sub = el.childNodes[1];
+    sub.style.display = 'unset';
+}
+
+function onLeaveCountry(el) {
+    var sub = el.childNodes[1];
+    sub.style.display = 'none';
 }
 
 function onChanged(item) {

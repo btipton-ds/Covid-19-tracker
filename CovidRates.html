@@ -16,23 +16,14 @@ and open the template in the editor.
     </head>
 
     <body onload="onLoad();">
-        <div id="countries">
-            <input id="US" type="checkbox" onchange="onChanged(this.id)" checked>
-            <label for="US">USA</label>
-
-            <input id="PH" type="checkbox" onchange="onChanged(this.id)">
-            <label for="PH">Philippines</label>
-
-            <input id="KR" type="checkbox" onchange="onChanged(this.id)">
-            <label for="KR">Republic of Korea</label>
-
-            <input id="BE" type="checkbox" onchange="onChanged(this.id)">
-            <label for="BE">Belgium</label>
+        <div style="float: left;">
+            <div id="cases">            
+            </div>
+            <div id="deaths">            
+            </div>
         </div>
-
-        <div id="cases">            
-        </div>
-        <div id="deaths">            
+        <div id="countries" style="float: left;">
+            You should not see this.
         </div>
     </body>
 </html>
