@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>COVID-19 Rate Tracker</title>
+        <meta charset="windows-1252">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
+        <script src="population.js"></script>
+        <script src="data.js"></script>
+        <script src="covidReduce.js"></script>
+    </head>
+
+    <body onload="onLoad();">
+        <div id="countries">
+            <input id="US" type="checkbox" onchange="onChanged(this.id)" checked>
+            <label for="US">USA</label>
+
+            <input id="PH" type="checkbox" onchange="onChanged(this.id)">
+            <label for="PH">Philippines</label>
+
+            <input id="KR" type="checkbox" onchange="onChanged(this.id)">
+            <label for="KR">Republic of Korea</label>
+
+            <input id="BE" type="checkbox" onchange="onChanged(this.id)">
+            <label for="BE">Belgium</label>
+        </div>
+
+        <div id="cases">            
+        </div>
+        <div id="deaths">            
+        </div>
+    </body>
+</html>
