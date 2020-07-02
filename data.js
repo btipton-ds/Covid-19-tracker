@@ -25448,8 +25448,8 @@ function getData() {
             }
             if (found)
                 pop /= 1.0e6;
-            else
-                console.error('Missing country name ' + name);
+//            else
+//                console.error('Missing country name ' + name);
 
             var data = {
                 name: name,

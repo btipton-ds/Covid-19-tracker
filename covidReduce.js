@@ -1,8 +1,13 @@
 
+function displayAll() {
+    displayData('cases');
+    displayData('caseSlope');
+    displayData('deaths');
+}
+
 function onLoad() {
     updateRadios();
-    displayData('cases');
-    displayData('deaths');
+    displayAll();
 }
 
 var selected = {
@@ -19,11 +24,11 @@ function updateRadios() {
     selection = {};
     
     var el = document.getElementById('countries');
-    el.innerHTML = '';
+    el.innerHTML = '<span style="float: left;">Pick Countries: </span>';
     var firstChar = -1;
-    var divBegin = '<div style="float: left;" onmouseleave="onLeaveCountry(this)" onmouseenter="onEnterCountry(this)">';
+    var divBegin = '<span style="float: left;" onmouseleave="onLeaveCountry(this)" onmouseenter="onEnterCountry(this)">';
     var alphaDiv = '';
-    var divStyled = '<div style="display:none; position: absolute; top: 20px; z-index: 1; background-color: rgb(245,245,255);">';
+    var divStyled = '<apan style="display:none; position: absolute; z-index: 1; background-color: rgb(245,245,255);">';
     keys.forEach(function(key){
         selection[key]=  (key === 'US');
         var checked = selection[key] ? 'checked' : '';
@@ -38,7 +43,7 @@ function updateRadios() {
         } else if (curFirst !== firstChar) {
             firstChar++;
             if (alphaDiv !== divBegin) {
-                el.innerHTML += alphaDiv + '</div></div>';
+                el.innerHTML += alphaDiv + '</span></span>';
                 alphaDiv = divBegin;
                 alphaDiv += String.fromCharCode(firstChar).toUpperCase() + '&nbsp;';
                 alphaDiv += divStyled;
@@ -68,13 +73,79 @@ function onLeaveCountry(el) {
 
 function onChanged(item) {
     selected[item] = !selected[item];
-    displayData('cases');
-    displayData('deaths');
+    displayAll();
+}
+
+function computeAverages(data, keys, selArr, idx, pop, result) {
+    var winSize = 7;
+    for (var i = (winSize - 1); i < data.length; i++) {
+        var sumCases = 0;
+        var sumDeaths = 0;
+        for (var j = 0; j < winSize; j++) {
+            var dataIdx = i + j - (winSize - 1);
+            var d = data[dataIdx];
+            sumCases += Number(d.dailyCases) / pop;
+            sumDeaths += Number(d.dailyDeaths) / pop;
+        }
+
+        var t = data[i].date.getTime();
+        if (!result.hasOwnProperty(t)) {
+            var arr = [];
+            for (var j = 0; j < selArr.length; j++) {
+                arr.push({
+                    'date': data[i].date,
+                    'countryCode': keys[j], 
+                    'cases': 0, 
+                    'deaths': 0,
+                });
+            }
+            result[t] = arr;
+        }
+
+        var entry = result[t][idx];
+        entry.cases = sumCases; 
+        entry.deaths = sumDeaths;
+    }
+    
+}
+
+function computeSlopes(dataArr) {
+    var winSize = 7;
+    var d = dataArr;
+    // inver the loop
+    var numSel = d[0].length;
+    for (var i = 0; i < numSel; i++) {
+        for (var j = (winSize - 1); j < dataArr.length; j++) {
+            var caseAvg = 0, deathAvg = 0;
+            for (var k = 0; k < winSize; k++) {
+                var idx = j - (winSize - 1) + k;
+                caseAvg += dataArr[idx][i].cases;
+                deathAvg += dataArr[idx][i].deaths;
+            }
+
+            caseAvg /= winSize;
+            deathAvg /= winSize;
+
+            var caseNumer = 0, denom = 0;
+            var deathNumer = 0;
+            var avgX = winSize / 2.0;
+            for (var k = 0; k < winSize; k++) {
+                var idx = j - (winSize - 1) + k;
+                caseNumer += (k - avgX) * (dataArr[idx][i].cases - caseAvg);
+                deathNumer += (k - avgX) * (dataArr[idx][i].deaths - deathAvg);
+
+                denom += (k - avgX) * (k - avgX);
+            }
+            var entry = dataArr[j][i];
+            entry.caseSlope = caseNumer / denom;
+            entry.deathSlope = deathNumer / denom;
+        }
+    }
 }
 
 function genData() {
     var dataSet = getData();
-    var result = {};
+    var result = {}; // TODO Change the result to an array. We need the map to order the unsynchronized dates.
 
     var selArr = [];
     var keys = Object.keys(selected);
@@ -92,34 +163,8 @@ function genData() {
         var pop = countryData.population;
         var data = countryData.data;
  
-        for (var i = 6; i < data.length; i++) {
-            var sumDailyCases = 0;
-            var sumDailyDeaths = 0;
-            for (var j = 0; j < 7; j++) {
-                var dataIdx = i + j - 6;
-                var d = data[dataIdx];
-                sumDailyCases += Number(d.dailyCases);
-                sumDailyDeaths += Number(d.dailyDeaths);
-            }
+        computeAverages(data, keys, selArr, idx, pop, result);
 
-            var t = data[i].date.getTime();
-            if (!result.hasOwnProperty(t)) {
-                var arr = [];
-                for (var j = 0; j < selArr.length; j++) {
-                    arr.push({
-                        'date': data[i].date,
-                        'countryCode': keys[j], 
-                        'cases': 0, 
-                        'deaths': 0
-                    });
-                }
-                result[t] = arr;
-            }
-            
-            var entry = result[t][idx];
-            entry.cases = sumDailyCases / pop; 
-            entry.deaths = sumDailyDeaths / pop; 
-        }
         idx++;
     });
 
@@ -144,8 +189,10 @@ function dumpData(data) {
 function getMinMax(data) {
     var result = {
         minDate: new Date(Date.now()),
-        cases: -1e20,
-        deaths: -1e20
+        cases: {min: 0, max: -1.0e20 },
+        deaths: {min: 0, max: -1.0e20 },
+        caseSlope: {min: 1.0e20, max: -1.0e20 },
+        deathSlope: {min: 1.0e20, max: -1.0e20 }
     };
     
     var entries = Object.keys(data);
@@ -159,11 +206,25 @@ function getMinMax(data) {
             if (entryTime < minTime) {
                 result.minDate = ed.date;
             }
-            if (ed.cases > result.cases) {
-                result.cases = ed.cases;
+            if (ed.cases > result.cases.max) {
+                result.cases.max = ed.cases;
             }
-            if (ed.deaths > result.deaths) {
-                result.deaths = ed.deaths;
+            if (ed.deaths > result.deaths.max) {
+                result.deaths.max = ed.deaths;
+            }
+
+            if (ed.caseSlope > result.caseSlope.max) {
+                result.caseSlope.max = ed.caseSlope;
+            }
+            if (ed.caseSlope < result.caseSlope.min) {
+                result.caseSlope.min = ed.caseSlope;
+            }
+
+            if (ed.deathSlope > result.deathSlope.max) {
+                result.deathSlope.max = ed.deathSlope;
+            }
+            if (ed.deathSlope < result.deathSlope.min) {
+                result.deathSlope.min = ed.deathSlope;
             }
         });
     });
@@ -185,33 +246,56 @@ function colorOf(idx) {
     return 'rgb(0,0,0)';
 }
 
-function calRoundedHeight(maxY) {
-    if (maxY > 2000)
+function calRoundedHeight0(val) {
+    if (val > 2000)
         return 5000;
-    else if (maxY > 1000)
+    else if (val > 1000)
         return 2000;
-    else if (maxY > 500)
+    else if (val > 500)
         return 1000;
-    else if (maxY > 300)
+    else if (val > 300)
         return 500;
-    else if (maxY > 100)
+    else if (val > 100)
         return 300;
-    else if (maxY > 50)
+    else if (val > 50)
         return 100;
-    else if (maxY > 30)
+    else if (val > 30)
         return 50;
-    else if (maxY > 10)
+    else if (val > 10)
         return 30;
-    else
+    else if (val > 5)
         return 10;
+    else if (val > 3)
+        return 5;
+    else if (val > 1)
+        return 3;
+    else
+        return 0;
+}
+
+function calRoundedHeight(minMax) {
+    var result = {min:0, max: 1};
+
+    if (minMax.min < 0)
+        result.min = -calRoundedHeight0(-minMax.min);
+    else
+        result.min = calRoundedHeight0(minMax.min);
+
+    var range = minMax.max - result.min;
+    
+    range = calRoundedHeight0(range);
+    result.max = result.min + range;
+
+    return result;
 }
 
 function drawYGrid(env, dataKind) {
-    var yHeight = calRoundedHeight(env.minMax[dataKind]);
+    var yRange = calRoundedHeight(env.minMax[dataKind]);
+    var yHeight = yRange.max - yRange.min;
     var yTickSize = yHeight / 10;
-    var yTick = 0;
+    var yTick = yRange.min;
     while (yTick <= yHeight) {
-        var y = env.yOrigin + env.graphHeight * (1 - (yTick / yHeight));
+        var y = env.yOrigin + env.graphHeight * (1 - ((yTick - yRange.min) / yHeight));
         env.draw.polyline([[env.xOrigin,y], [env.xOrigin + env.graphWidth, y]]).fill('none').attr(
         {
             'stroke-width':'1', 
@@ -223,7 +307,7 @@ function drawYGrid(env, dataKind) {
         });
         yTick += yTickSize;
     }
-    return yHeight;
+    return yRange;
 }
 
 function drawXGrid(env, dataArr) {
@@ -248,16 +332,6 @@ function drawXGrid(env, dataArr) {
 
 function genGraph(dataKind) {
     var dataSet = genData();
-    var env = {
-        minMax: getMinMax(dataSet),
-        imageHeight: 800, 
-        imageWidth: 800,
-        xOrigin: 50, 
-        yOrigin: 25
-    };
-    env.graphHeight = env.imageHeight - env.yOrigin; 
-    env.graphWidth = env.imageWidth - env.xOrigin;
-
     var dataArr = [];
     var dataKeys = Object.keys(dataSet);
     dataKeys.sort(function(a,b){
@@ -267,18 +341,32 @@ function genGraph(dataKind) {
         dataArr.push(dataSet[key]);
     });
 
+    computeSlopes(dataArr);
+
+    var env = {
+        minMax: getMinMax(dataArr),
+        imageHeight: 800, 
+        imageWidth: 800,
+        xOrigin: 50, 
+        yOrigin: 25
+    };
+    env.graphHeight = env.imageHeight - env.yOrigin; 
+    env.graphWidth = env.imageWidth - env.xOrigin;
+
     var el = document.getElementById(dataKind);
     el.innerHTML = '';
     
     
     env.draw = SVG().addTo('#' + dataKind).size(env.imageWidth, env.imageHeight);
     env.draw.rect(env.graphWidth, env.graphHeight).attr({ 'fill': 'rgb(235,235,235)' }).move(env.xOrigin, env.yOrigin);
-    var yHeight = drawYGrid(env, dataKind);
+    var yRange = drawYGrid(env, dataKind);
     drawXGrid(env, dataArr);
 
     var polylines = {};
     var idx = 0;
     var w = dataArr.length;
+    var yMin = yRange.min;
+    var yHeight = yRange.max - yRange.min;
     dataArr.forEach(function(data){
         data.forEach(function(cd){
             var countryCode = cd.countryCode;
@@ -286,7 +374,12 @@ function genGraph(dataKind) {
                 polylines[countryCode] = [];
             }
             var points = polylines[countryCode];
-            var scaledY = cd[dataKind] / yHeight;
+            var val = 0;
+            if (cd.hasOwnProperty(dataKind))
+                val = cd[dataKind];
+            var scaledY = (val - yMin) / yHeight ;
+            if (dataKind === "caseSlope")
+                console.log(scaledY);
             var pt = [env.xOrigin + env.graphWidth * (idx / w), env.yOrigin + env.graphHeight * (1 - scaledY)];
             points.push(pt);
         });
