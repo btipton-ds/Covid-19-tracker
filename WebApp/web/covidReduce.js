@@ -45,7 +45,7 @@ function updateRadios() {
     var firstChar = -1;
     var divBegin = '<span style="float: left; width:20pt;" onmouseleave="onLeaveCountry(this)" onmouseenter="onEnterCountry(this)">';
     var alphaDiv = '';
-    var divStyled = '<apan style="display:none; position: absolute; background-color: rgb(245,245,255);">';
+    var divStyled = '<div style="display:none; position: absolute; background-color: rgb(245,245,255);">';
     var pad = '';
     keys.forEach(function(key){
         selection[key]=  (key === 'US');
@@ -61,7 +61,7 @@ function updateRadios() {
         } else if (curFirst !== firstChar) {
             firstChar++;
             if (alphaDiv !== divBegin) {
-                el.innerHTML += alphaDiv + '</span></span>';
+                el.innerHTML += alphaDiv;
                 alphaDiv = divBegin;
                 alphaDiv += String.fromCharCode(firstChar).toUpperCase() + '&nbsp;';
                 alphaDiv += divStyled;
@@ -69,13 +69,12 @@ function updateRadios() {
         }
 
         alphaDiv += '<div>';
-        alphaDiv += '<input id="' + key + '" type="checkbox" onchange="onChanged(this.id)" ' + checked + '>';
+        alphaDiv += '<input id="' + key + '" type="checkbox" onchange="onChanged(this)" ' + checked + '>';
         alphaDiv += '<label for="' + key + '">' + cd.name + '</label>';
-        alphaDiv += '</div>';
     });
     
     if (alphaDiv !== divBegin) {
-        el.innerHTML += alphaDiv + '</div>';
+        el.innerHTML += alphaDiv;
     }
 }
 
@@ -89,7 +88,19 @@ function onLeaveCountry(el) {
     sub.style.display = 'none';
 }
 
-function onChanged(item) {
+function clearAll() {
+    var keys = Object.keys(selected);
+    keys.forEach(function(key){
+        var checkEl = document.getElementById(key);
+        if (checkEl)
+            checkEl.checked = false;
+    });
+    selected = {};
+    displayAll();
+}
+
+function onChanged(el) {
+    var item = el.id;
     selected[item] = !selected[item];
     displayAll();
 }
@@ -128,6 +139,8 @@ function computeAverages(data, keys, selArr, idx, pop, result) {
 }
 
 function computeSlopes(dataArr) {
+    if (dataArr.length === 0)
+        return;
     var winSize = 7;
     var d = dataArr;
     // inver the loop
@@ -335,31 +348,44 @@ function drawYGridLine(env, y, label) {
 function drawYGrid(env, dataKind) {
     var yMinMAx = calRoundedHeight(env.minMax[dataKind]);
     var yRange = yMinMAx.max - yMinMAx.min;
-    var yTickSize = 0.001;
+    var yTS = 0.001;
 
-    if (yRange >= 500)
-        yTickSize = 100;
-    else if (yRange >= 100)
-        yTickSize = 20;
-    else if (yRange >= 50)
-        yTickSize = 10;
-    else if (yRange >= 10)
-        yTickSize = 5;
-    else if (yRange >= 5)
-        yTickSize = 2;
-    else if (yRange >= 1)
-        yTickSize = 0.1;
-    else if (yRange >= .1)
-        yTickSize = 0.01;
-    
+    var numTicks = Math.round(yRange / yTS);
+    while (numTicks > 10) {
+        if (yTS === .001 || yTS === 0.01 || yTS === 0.1 || yTS === 1 || yTS === 10 || yTS === 100)
+            yTS *= 2;
+        else if (yTS === .002 || yTS === 0.02 || yTS === 0.2 || yTS === 2 || yTS === 20 || yTS === 200)
+            yTS *= 2.5;
+        else if (yTS === .005 || yTS === 0.05 || yTS === 0.5 || yTS === 5 || yTS === 50 || yTS === 500)
+            yTS *= 2;
+        numTicks = Math.round(yRange / yTS);
+    }
+    yTS = yRange / numTicks;
+    var digits = 3;
+    if (yTS < 0.01)
+        digits = 3;
+    else if (yTS < 0.1)
+        digits = 2;
+    else if (yTS < 1)
+        digits = 1;
+    else digits = 0;
+
+    var drewZero = false;
     var yTick = yMinMAx.min, y;
     while (yTick <= yRange) {
         y = env.yOrigin + env.graphHeight * (1 - ((yTick - yMinMAx.min) / yRange));
-        drawYGridLine(env, y, yTick);
-        yTick += yTickSize;
+        if (Math.abs(yTick) < 1.0e-6) {
+            yTick = 0;
+            drewZero = true;
+        }
+        drawYGridLine(env, y, yTick.toFixed(digits));
+        yTick += yTS;
     }
-    y = env.yOrigin + env.graphHeight * (1 - ((0 - yMinMAx.min) / yRange));
-    drawYGridLine(env, y, 0);
+    if (!drewZero) {
+        yTick = 0;
+        y = env.yOrigin + env.graphHeight * (1 - ((0 - yMinMAx.min) / yRange));    
+        drawYGridLine(env, y, yTick.toFixed(digits));
+    }
     return yMinMAx;
 }
 
