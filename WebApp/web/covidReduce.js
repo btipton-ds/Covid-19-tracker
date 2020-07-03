@@ -4,10 +4,15 @@ function displayAll() {
     displayData('caseSlope');
     displayData('deaths');
 }
+var gWHORawData = null;
 
 function onLoad() {
+    readData();
+}
+
+function begin() {
     updateRadios();
-    displayAll();
+    displayAll();    
 }
 
 var selected = {
