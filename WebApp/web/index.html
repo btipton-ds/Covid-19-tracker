@@ -1,13 +1,8 @@
 <!DOCTYPE html>
-<!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
--->
 <html>
     <head>
+        <meta charset="utf-8">        
         <title>COVID-19 Rate Tracker</title>
-        <meta charset="windows-1252">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="jquery-3.5.1.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
@@ -16,17 +11,34 @@ and open the template in the editor.
         <script src="covidReduce.js"></script>
     </head>
 
+<!--
+Copyright 2020 Robert R Tipton of Dark Sky Innovative Solutions
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+If this software is used, proper attribution to Dark Sky Innovative Solutions (http://darkskyinnovation.com/) must be displayed.
+If the algorithms or methods in the software are modified, Dark Sky Innovative Solutions must be referenced and it must be clearly stated that the algorithms have been modified.
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+-->
+
     <body onload="onLoad();">
+        <div>
+             By <a href="http://darkskyinnovation.com/covid---public-service.html">Dark Sky Innovative Solutions</a>
+        </div>
+        <div id="countries">
+            Loading WHO data file. Please wait.
+        </div>
         <div style="float: left;">
-            <div id="cases">            
+            <div id="cases" style="float: left;">            
             </div>
-            <div id="caseSlope">            
-            </div>
-            <div id="deaths">            
+            <div id="caseSlope" style="float: left;">            
             </div>
         </div>
-        <div id="countries" style="float: left;">
-            Loading WHO data file. Please wait.
+        <div>
+            <div id="deaths">            
+            </div>
         </div>
     </body>
 </html>

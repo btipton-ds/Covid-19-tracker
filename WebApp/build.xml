@@ -7,8 +7,8 @@
 <!-- the Compile on Save feature is turned off for the project. -->
 <!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
 <!-- in the project's Project Properties dialog box.-->
-<project name="WebApp2" default="default" basedir=".">
-    <description>Builds, tests, and runs the project WebApp2.</description>
+<project name="Covid-19-track-WebApp" default="default" basedir=".">
+    <description>Builds, tests, and runs the project Covid-19-track-WebApp.</description>
     <import file="nbproject/build-impl.xml"/>
     <!--
 

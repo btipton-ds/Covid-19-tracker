@@ -1,3 +1,15 @@
+/*
+Copyright 2020 Robert R Tipton of Dark Sky Innovative Solutions
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+If this software is used, proper attribution to Dark Sky Innovative Solutions (http://darkskyinnovation.com/) must be displayed.
+If the algorithms or methods in the software are modified, Dark Sky Innovative Solutions must be referenced and it must be clearly stated that the algorithms have been modified.
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
 var populationLUT = {
 'China': 1433783686,
 'India': 1366417754,
@@ -161,7 +173,7 @@ var populationLUT = {
 'Eswatini': 1148130,
 'Djibouti': 973560,
 'Fiji': 889953,
-'Réunion (France)': 888927,
+'Rï¿½union (France)': 888927,
 'Comoros': 850886,
 'Guyana': 782766,
 'Bhutan': 763092,
@@ -186,12 +198,12 @@ var populationLUT = {
 'French Guiana (France)': 282731,
 'French Polynesia (France)': 279287,
 'Mayotte (France)': 266150,
-'São Tomé and Príncipe': 215056,
+'Sï¿½o Tomï¿½ and Prï¿½ncipe': 215056,
 'Western Samoa': 197097,
 'Saint Lucia': 182790,
 'Channel Islands (United Kingdom)': 172259,
 'Guam (United States)': 167294,
-'Curaçao (Netherlands)': 163424,
+'Curaï¿½ao (Netherlands)': 163424,
 'Kiribati': 117606,
 'F.S. Micronesia': 113815,
 'Grenada': 112003,

@@ -1,3 +1,14 @@
+/*
+Copyright 2020 Robert R Tipton of Dark Sky Innovative Solutions
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+If this software is used, proper attribution to Dark Sky Innovative Solutions (http://darkskyinnovation.com/) must be displayed.
+If the algorithms or methods in the software are modified, Dark Sky Innovative Solutions must be referenced and it must be clearly stated that the algorithms have been modified.
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 
 function displayAll() {
     displayData('cases');
@@ -99,7 +110,7 @@ function computeAverages(data, keys, selArr, idx, pop, result) {
             for (var j = 0; j < selArr.length; j++) {
                 arr.push({
                     'date': data[i].date,
-                    'countryCode': keys[j], 
+                    'countryCode': selArr[j], 
                     'cases': 0, 
                     'deaths': 0,
                 });
@@ -148,8 +159,7 @@ function computeSlopes(dataArr) {
     }
 }
 
-function genData() {
-    var dataSet = getData();
+function genData(dataSet) {
     var result = {}; // TODO Change the result to an array. We need the map to order the unsynchronized dates.
 
     var selArr = [];
@@ -237,18 +247,41 @@ function getMinMax(data) {
     return result;
 }
 
+function rgbOf(r,g,b) {
+    return 'rgb(' + r + "," + g + ',' + b + ')';
+}
+
 function colorOf(idx) {
+    var max = 200;
+    var mid = 100;
     switch (idx) {
         case 0: 
-            return 'rgb(255,0,0)';
+            return rgbOf(max,0,0);
         case 1: 
-            return 'rgb(0,255,0)';
+            return rgbOf(0,max,0);
         case 2: 
-            return 'rgb(0,0,255)';
+            return rgbOf(0,0,max);
         case 3: 
-            return 'rgb(255,255,0)';
+            return rgbOf(max,max,0);
+        case 4: 
+            return rgbOf(max,0,max);
+        case 5: 
+            return rgbOf(0,max,max);
+
+        case 6: 
+            return rgbOf(max,mid,mid);
+        case 7: 
+            return rgbOf(mid,max,mid);
+        case 8: 
+            return rgbOf(mid,mid,max);
+        case 9: 
+            return rgbOf(max,max,mid);
+        case 10: 
+            return rgbOf(max,mid,max);
+        case 11: 
+            return rgbOf(mid,max,max);
     }
-    return 'rgb(0,0,0)';
+    return rgbOf(0,0,0);
 }
 
 function calRoundedHeight0(val) {
@@ -324,8 +357,8 @@ function drawXGrid(env, dataArr) {
                 date = cd.date;
         });
         if (date.getDay() === 0) {
-            var x = env.xOrigin + env.graphWidth * (1 - (i / dataArr.length));
-            env.draw.polyline([[env.xOrigin + x, env.yOrigin], [env.xOrigin + x, env.yOrigin + env.graphHeight]]).fill('none').attr(
+            var x = env.xOrigin + env.graphWidth * (i / dataArr.length);
+            env.draw.polyline([[x, env.yOrigin], [x, env.yOrigin + env.graphHeight]]).fill('none').attr(
             {
                 'stroke-width':'1', 
                 'stroke': 'rgb(128,128,128)' 
@@ -336,7 +369,8 @@ function drawXGrid(env, dataArr) {
 }
 
 function genGraph(dataKind) {
-    var dataSet = genData();
+    var whoData = getData();
+    var dataSet = genData(whoData);
     var dataArr = [];
     var dataKeys = Object.keys(dataSet);
     dataKeys.sort(function(a,b){
@@ -355,8 +389,10 @@ function genGraph(dataKind) {
         xOrigin: 50, 
         yOrigin: 25
     };
+    
+    var rightMargin = 50;
     env.graphHeight = env.imageHeight - env.yOrigin; 
-    env.graphWidth = env.imageWidth - env.xOrigin;
+    env.graphWidth = env.imageWidth - env.xOrigin - rightMargin;
 
     var el = document.getElementById(dataKind);
     el.innerHTML = '';
@@ -383,8 +419,6 @@ function genGraph(dataKind) {
             if (cd.hasOwnProperty(dataKind))
                 val = cd[dataKind];
             var scaledY = (val - yMin) / yHeight ;
-            if (dataKind === "caseSlope")
-                console.log(scaledY);
             var pt = [env.xOrigin + env.graphWidth * (idx / w), env.yOrigin + env.graphHeight * (1 - scaledY)];
             points.push(pt);
         });
@@ -392,11 +426,26 @@ function genGraph(dataKind) {
     });
  
     idx = 0;
-    var plKeys = Object.keys(polylines);
-    plKeys.forEach(function(plKey){
-        var points = polylines[plKey];
+    var countryCodes = Object.keys(polylines);
+    
+    var text = env.draw.text(function(add) {
+        add.tspan("").newLine().dx(env.xOrigin);
+        countryCodes.forEach(function(countryCode){
+            var cd = whoData[countryCode];
+            var name = '--- ' + cd.name;        
+            var color = colorOf(idx);
+            add.tspan(name).fill(color).newLine().dx(env.xOrigin);
+
+            idx++;
+        });
+    });
+
+    idx  = 0;
+    countryCodes.forEach(function(countryCode){
+        var points = polylines[countryCode];
         var color = colorOf(idx);
         env.draw.polyline(points).fill('none').attr({ 'stroke-width':'3', 'stroke': color });
+
         idx++;
     });
 }

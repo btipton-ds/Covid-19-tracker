@@ -1,3 +1,14 @@
+/*
+Copyright 2020 Robert R Tipton of Dark Sky Innovative Solutions
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+If this software is used, proper attribution to Dark Sky Innovative Solutions (http://darkskyinnovation.com/) must be displayed.
+If the algorithms or methods in the software are modified, Dark Sky Innovative Solutions must be referenced and it must be clearly stated that the algorithms have been modified.
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 
 function dateOf(str) {
     // 2020-02-10
@@ -14,18 +25,26 @@ function sleep(milliseconds) {
 }
 
 async function readData() {
-  await $.ajax({
-    url:'WHO-COVID-19-global-data.csv'
-  }).then(function (data){
+  await $.ajax('WHO-COVID-19-global-data.csv', 
+    {
+        mimeType : '"text/html"',
+        dataType :'text'
+    }
+          ).then(function (data){
         gWHORawData = data;
         begin();
     });
     
 }
+
+var whoDataMap = null;
+
 function getData() {
     if (!gWHORawData)
         return;
-    var map = {};
+    if (whoDataMap)
+        return whoDataMap;
+    var whoDataMap = {};
     var entries = gWHORawData.split("\n");
     entries.forEach(function(str){
         if (str.indexOf('Date_reported') !== -1)
@@ -48,7 +67,7 @@ function getData() {
             str = str.substring(str.indexOf(',') + 1);
 
         var fields = str.split(",");
-        if (!map.hasOwnProperty(countryCode)) {
+        if (!whoDataMap.hasOwnProperty(countryCode)) {
             var pop = 1;
             var found = false;
             if (populationLUT.hasOwnProperty(name)) {
@@ -74,7 +93,7 @@ function getData() {
                 region: fields[0], 
                 data: []
             };
-            map[countryCode] = data;
+            whoDataMap[countryCode] = data;
         }
         var entry = {
             date: dateOf(dateStr),
@@ -82,7 +101,7 @@ function getData() {
             dailyDeaths: fields[3]
         };
 
-        map[countryCode].data.push(entry);
+        whoDataMap[countryCode].data.push(entry);
     });
-    return map;
+    return whoDataMap;
 }
