@@ -9,6 +9,22 @@
         <script src="population.js"></script>
         <script src="data.js"></script>
         <script src="covidReduce.js"></script>
+        <style>
+            .title {
+                font-family: TimesNewRoman;
+                font-size: 14pt;
+                text-align: center;
+                font-weight: bold;
+            }
+            .graph {
+                float: left;
+                border-style: solid;
+                border-width: 1pt;
+                padding: 2pt;
+                margin: 2pt;
+                box-shadow: 2px 4px gray;
+            }
+        </style>
     </head>
 
 <!--
@@ -31,13 +47,27 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             Loading WHO data file. Please wait.
         </div>
         <div style="float: left;">
-            <div id="cases" style="float: left;">            
+            <div class="graph">
+                <div class="title">COVID-19 Cases Per Week / 1 Million Population</div>
+                <div id="cases">            
+                </div>
             </div>
-            <div id="caseSlope" style="float: left;">            
+            <div class="graph">
+                <div class="title">COVID-19 Slope of Cases Per Week / 1 Million Population</div>
+                <div id="caseSlope">            
+                </div>
             </div>
         </div>
         <div>
-            <div id="deaths">            
+            <div class="graph">
+                <div class="title">COVID-19 Deaths Per Week / 1 Million Population</div>
+                <div id="deaths">            
+                </div>
+            </div>
+            <div class="graph">
+                <div class="title">COVID-19 Slope of Deaths Per Week / 1 Million Population</div>
+                <div id="deathSlope">            
+                </div>
             </div>
         </div>
     </body>

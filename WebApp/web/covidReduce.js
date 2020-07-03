@@ -14,6 +14,7 @@ function displayAll() {
     displayData('cases');
     displayData('caseSlope');
     displayData('deaths');
+    displayData('deathSlope');
 }
 var gWHORawData = null;
 
@@ -42,9 +43,10 @@ function updateRadios() {
     var el = document.getElementById('countries');
     el.innerHTML = '<span style="float: left;">Pick Countries: </span>';
     var firstChar = -1;
-    var divBegin = '<span style="float: left;" onmouseleave="onLeaveCountry(this)" onmouseenter="onEnterCountry(this)">';
+    var divBegin = '<span style="float: left; width:20pt;" onmouseleave="onLeaveCountry(this)" onmouseenter="onEnterCountry(this)">';
     var alphaDiv = '';
-    var divStyled = '<apan style="display:none; position: absolute; z-index: 1; background-color: rgb(245,245,255);">';
+    var divStyled = '<apan style="display:none; position: absolute; background-color: rgb(245,245,255);">';
+    var pad = '';
     keys.forEach(function(key){
         selection[key]=  (key === 'US');
         var checked = selection[key] ? 'checked' : '';
@@ -54,7 +56,7 @@ function updateRadios() {
         if (firstChar === -1) {
             firstChar = curFirst;
             alphaDiv = divBegin;
-            alphaDiv += String.fromCharCode(firstChar).toUpperCase() + '&nbsp;';
+            alphaDiv += pad + String.fromCharCode(firstChar).toUpperCase() + pad;
             alphaDiv += divStyled;
         } else if (curFirst !== firstChar) {
             firstChar++;
@@ -256,11 +258,11 @@ function colorOf(idx) {
     var mid = 100;
     switch (idx) {
         case 0: 
-            return rgbOf(max,0,0);
+            return rgbOf(0,0,max);
         case 1: 
             return rgbOf(0,max,0);
         case 2: 
-            return rgbOf(0,0,max);
+            return rgbOf(max,0,0);
         case 3: 
             return rgbOf(max,max,0);
         case 4: 
@@ -286,29 +288,20 @@ function colorOf(idx) {
 
 function calRoundedHeight0(val) {
     if (val > 2000)
-        return 5000;
-    else if (val > 1000)
-        return 2000;
+        return Math.round((val + 199) / 200) * 200;
     else if (val > 500)
-        return 1000;
-    else if (val > 300)
-        return 500;
+        return Math.round((val + 99) / 100) * 100;
     else if (val > 100)
-        return 300;
-    else if (val > 50)
-        return 100;
-    else if (val > 30)
-        return 50;
+        return Math.round((val + 49) / 50) * 50;
     else if (val > 10)
-        return 30;
+        return Math.round((val + 9) / 10) * 10;
     else if (val > 5)
-        return 10;
-    else if (val > 3)
-        return 5;
+        return Math.round((val + 4) / 5) * 5;
     else if (val > 1)
-        return 3;
-    else
-        return 0;
+        return Math.round((val + 0.9) / 1) * 1;
+    else if (val > .1)
+        return Math.round((val + 0.09) / .1) * .1;
+    return 0;
 }
 
 function calRoundedHeight(minMax) {
@@ -327,13 +320,7 @@ function calRoundedHeight(minMax) {
     return result;
 }
 
-function drawYGrid(env, dataKind) {
-    var yRange = calRoundedHeight(env.minMax[dataKind]);
-    var yHeight = yRange.max - yRange.min;
-    var yTickSize = yHeight / 10;
-    var yTick = yRange.min;
-    while (yTick <= yHeight) {
-        var y = env.yOrigin + env.graphHeight * (1 - ((yTick - yRange.min) / yHeight));
+function drawYGridLine(env, y, label) {
         env.draw.polyline([[env.xOrigin,y], [env.xOrigin + env.graphWidth, y]]).fill('none').attr(
         {
             'stroke-width':'1', 
@@ -341,11 +328,39 @@ function drawYGrid(env, dataKind) {
         });
 
         var text = env.draw.text(function(add) {
-          add.tspan(yTick).dy(y);
+          add.tspan(label).dy(y);
         });
+}
+
+function drawYGrid(env, dataKind) {
+    var yMinMAx = calRoundedHeight(env.minMax[dataKind]);
+    var yRange = yMinMAx.max - yMinMAx.min;
+    var yTickSize = 0.001;
+
+    if (yRange >= 500)
+        yTickSize = 100;
+    else if (yRange >= 100)
+        yTickSize = 20;
+    else if (yRange >= 50)
+        yTickSize = 10;
+    else if (yRange >= 10)
+        yTickSize = 5;
+    else if (yRange >= 5)
+        yTickSize = 2;
+    else if (yRange >= 1)
+        yTickSize = 0.1;
+    else if (yRange >= .1)
+        yTickSize = 0.01;
+    
+    var yTick = yMinMAx.min, y;
+    while (yTick <= yRange) {
+        y = env.yOrigin + env.graphHeight * (1 - ((yTick - yMinMAx.min) / yRange));
+        drawYGridLine(env, y, yTick);
         yTick += yTickSize;
     }
-    return yRange;
+    y = env.yOrigin + env.graphHeight * (1 - ((0 - yMinMAx.min) / yRange));
+    drawYGridLine(env, y, 0);
+    return yMinMAx;
 }
 
 function drawXGrid(env, dataArr) {
@@ -400,14 +415,14 @@ function genGraph(dataKind) {
     
     env.draw = SVG().addTo('#' + dataKind).size(env.imageWidth, env.imageHeight);
     env.draw.rect(env.graphWidth, env.graphHeight).attr({ 'fill': 'rgb(235,235,235)' }).move(env.xOrigin, env.yOrigin);
-    var yRange = drawYGrid(env, dataKind);
+    var yMinMAx = drawYGrid(env, dataKind);
     drawXGrid(env, dataArr);
 
     var polylines = {};
     var idx = 0;
     var w = dataArr.length;
-    var yMin = yRange.min;
-    var yHeight = yRange.max - yRange.min;
+    var yMin = yMinMAx.min;
+    var yHeight = yMinMAx.max - yMinMAx.min;
     dataArr.forEach(function(data){
         data.forEach(function(cd){
             var countryCode = cd.countryCode;
@@ -430,6 +445,7 @@ function genGraph(dataKind) {
     
     var text = env.draw.text(function(add) {
         add.tspan("").newLine().dx(env.xOrigin);
+        add.tspan("Dark Sky Innovative Solutions.").fill('rgb(0,0,127)').newLine().dx(env.xOrigin);
         countryCodes.forEach(function(countryCode){
             var cd = whoData[countryCode];
             var name = '--- ' + cd.name;        
@@ -438,13 +454,16 @@ function genGraph(dataKind) {
 
             idx++;
         });
+    }).font({
+        family:   'TimesNewRoman'
+      , size:     20
     });
 
     idx  = 0;
     countryCodes.forEach(function(countryCode){
         var points = polylines[countryCode];
         var color = colorOf(idx);
-        env.draw.polyline(points).fill('none').attr({ 'stroke-width':'3', 'stroke': color });
+        env.draw.polyline(points).fill('none').attr({ 'stroke-width':'2', 'stroke': color });
 
         idx++;
     });
