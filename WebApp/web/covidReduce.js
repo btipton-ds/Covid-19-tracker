@@ -10,6 +10,8 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+var winSize = 7;
+
 function displayAll() {
     displayData('cases');
     displayData('caseSlope');
@@ -23,7 +25,9 @@ function onLoad() {
 }
 
 function begin() {
+    winSize = 7;
     updateRadios();
+    setSmoothingDays();
     displayAll();    
 }
 
@@ -105,8 +109,38 @@ function onChanged(el) {
     displayAll();
 }
 
+function setSmoothingDays() {
+    switch (winSize) {
+        case 7: 
+            document.getElementById('days_7').checked = true;
+            document.getElementById('days_14').checked = false;
+            document.getElementById('days_21').checked = false;
+            break;
+        case 14: 
+            document.getElementById('days_7').checked = false;
+            document.getElementById('days_14').checked = true;
+            document.getElementById('days_21').checked = false;
+            break;
+        case 21: 
+            document.getElementById('days_7').checked = false;
+            document.getElementById('days_14').checked = false;
+            document.getElementById('days_21').checked = true;
+            break;
+        default:
+            break;
+    }    
+}
+
+function daysSmoothingChanged(days) {
+    if (days != winSize) {
+        winSize = days;
+        setSmoothingDays();
+        displayAll();
+    }
+}
+
 function computeAverages(data, keys, selArr, idx, pop, result) {
-    var winSize = 7;
+    var scale = 7 / winSize;
     for (var i = (winSize - 1); i < data.length; i++) {
         var sumCases = 0;
         var sumDeaths = 0;
@@ -132,8 +166,8 @@ function computeAverages(data, keys, selArr, idx, pop, result) {
         }
 
         var entry = result[t][idx];
-        entry.cases = sumCases; 
-        entry.deaths = sumDeaths;
+        entry.cases = sumCases * scale; 
+        entry.deaths = sumDeaths * scale;
     }
     
 }
@@ -141,7 +175,7 @@ function computeAverages(data, keys, selArr, idx, pop, result) {
 function computeSlopes(dataArr) {
     if (dataArr.length === 0)
         return;
-    var winSize = 7;
+
     var d = dataArr;
     // inver the loop
     var numSel = d[0].length;
@@ -314,6 +348,10 @@ function calRoundedHeight0(val) {
         return Math.round((val + 0.9) / 1) * 1;
     else if (val > .1)
         return Math.round((val + 0.09) / .1) * .1;
+    else if (val > .01)
+        return Math.round((val + 0.009) / .01) * .01;
+    else if (val > .001)
+        return Math.round((val + 0.0009) / .001) * .001;
     return 0;
 }
 

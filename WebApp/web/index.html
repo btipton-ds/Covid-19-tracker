@@ -43,10 +43,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <div>
              By <a href="http://darkskyinnovation.com/covid---public-service.html">Dark Sky Innovative Solutions</a>
         </div>
-        <div id="countries">
+        <div>
+            Smoothing days: <input type="radio" id="days_7" value="7" onchange="daysSmoothingChanged(7)" checked>7
+            <input type="radio" id="days_14" value="14" onchange="daysSmoothingChanged(14)">14
+            <input type="radio" id="days_21" value="21" onchange="daysSmoothingChanged(21)">21
+        </div>
+        <div id="countries" style="float: left;">
             Loading WHO data file. Please wait.
         </div>
-        <div> <button type="button" onclick="clearAll()">Clear All</button></div>
+        <div  style="float: left;"> <button type="button" onclick="clearAll()">Clear All</button></div>
         <div style="float: left;">
             <div class="graph">
                 <div class="title">COVID-19 Cases Per Week / 1 Million Population</div>
