@@ -11,17 +11,30 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 
 var winSize = 7;
-
-function displayAll() {
-    displayData('cases');
-    displayData('caseSlope');
-    displayData('deaths');
-    displayData('deathSlope');
-}
 var gWHORawData = null;
+var selected = {
+    'PH': false,
+    'KR': false,
+    'BE': false,
+    'US': true
+    };
+
+
+
+async function setConutryCode() {
+  await $.ajax('http://ip-api.com/json', {
+        mimeType : '"text/json"',
+        dataType :'json'
+    }).then(function (data){
+        var cc = data.countryCode;
+          selected = {};
+          selected[cc] = true;
+          readData();
+    });
+}
 
 function onLoad() {
-    readData();
+    setConutryCode();
 }
 
 function begin() {
@@ -31,18 +44,16 @@ function begin() {
     displayAll();    
 }
 
-var selected = {
-    'PH': false,
-    'KR': false,
-    'BE': false,
-    'US': true
-    };
+function displayAll() {
+    displayData('cases');
+    displayData('caseSlope');
+    displayData('deaths');
+    displayData('deathSlope');
+}
 
 function updateRadios() {
     var dataSet = getData();
     var keys = Object.keys(dataSet);
-    
-    selection = {};
     
     var el = document.getElementById('countries');
     el.innerHTML = '<span style="float: left;">Pick Countries: </span>';
@@ -52,8 +63,7 @@ function updateRadios() {
     var divStyled = '<div style="display:none; position: absolute; background-color: rgb(245,245,255);">';
     var pad = '';
     keys.forEach(function(key){
-        selection[key]=  (key === 'US');
-        var checked = selection[key] ? 'checked' : '';
+        var checked = selected[key] ? 'checked' : '';
 
         var cd = dataSet[key];
         var curFirst = cd.name.toLowerCase().charCodeAt(0);
@@ -141,11 +151,14 @@ function daysSmoothingChanged(days) {
 
 function computeAverages(data, keys, selArr, idx, pop, result) {
     var scale = 7 / winSize;
-    for (var i = (winSize - 1); i < data.length; i++) {
+    for (var i = 0; i < data.length; i++) {
         var sumCases = 0;
         var sumDeaths = 0;
-        for (var j = 0; j < winSize; j++) {
-            var dataIdx = i + j - (winSize - 1);
+        var steps = winSize;
+        if (i < winSize)
+            steps = i;
+        for (var j = 0; j < steps; j++) {
+            var dataIdx = i + j - (steps - 1);
             var d = data[dataIdx];
             sumCases += Number(d.dailyCases) / pop;
             sumDeaths += Number(d.dailyDeaths) / pop;
@@ -180,30 +193,38 @@ function computeSlopes(dataArr) {
     // inver the loop
     var numSel = d[0].length;
     for (var i = 0; i < numSel; i++) {
-        for (var j = (winSize - 1); j < dataArr.length; j++) {
+        for (var j = 0; j < dataArr.length; j++) {
+            var entry = dataArr[j][i];
             var caseAvg = 0, deathAvg = 0;
-            for (var k = 0; k < winSize; k++) {
-                var idx = j - (winSize - 1) + k;
-                caseAvg += dataArr[idx][i].cases;
-                deathAvg += dataArr[idx][i].deaths;
-            }
-
-            caseAvg /= winSize;
-            deathAvg /= winSize;
-
             var caseNumer = 0, denom = 0;
             var deathNumer = 0;
-            var avgX = winSize / 2.0;
-            for (var k = 0; k < winSize; k++) {
-                var idx = j - (winSize - 1) + k;
-                caseNumer += (k - avgX) * (dataArr[idx][i].cases - caseAvg);
-                deathNumer += (k - avgX) * (dataArr[idx][i].deaths - deathAvg);
+            var steps = winSize;
+            if (j < winSize)
+                steps = j;
+            if (steps > 0) {
+                for (var k = 0; k < steps; k++) {
+                    var idx = j - (steps - 1) + k;
+                    caseAvg += dataArr[idx][i].cases;
+                    deathAvg += dataArr[idx][i].deaths;
+                }
 
-                denom += (k - avgX) * (k - avgX);
+                caseAvg /= steps;
+                deathAvg /= steps;
+
+                var avgX = steps / 2.0;
+                for (var k = 0; k < steps; k++) {
+                    var idx = j - (steps - 1) + k;
+                    caseNumer += (k - avgX) * (dataArr[idx][i].cases - caseAvg);
+                    deathNumer += (k - avgX) * (dataArr[idx][i].deaths - deathAvg);
+
+                    denom += (k - avgX) * (k - avgX);
+                }
+                entry.caseSlope = caseNumer / denom;
+                entry.deathSlope = deathNumer / denom;
+            } else {
+                entry.caseSlope = 0;
+                entry.deathSlope = 0;
             }
-            var entry = dataArr[j][i];
-            entry.caseSlope = caseNumer / denom;
-            entry.deathSlope = deathNumer / denom;
         }
     }
 }
@@ -297,7 +318,7 @@ function getMinMax(data) {
 }
 
 function rgbOf(r,g,b) {
-    return 'rgb(' + r + "," + g + ',' + b + ')';
+    return 'rgb(' + Math.round(r) + "," + Math.round(g) + ',' + Math.round(b) + ')';
 }
 
 function colorOf(idx) {
@@ -410,8 +431,8 @@ function drawYGrid(env, dataKind) {
 
     var drewZero = false;
     var yTick = yMinMAx.min, y;
-    while (yTick <= yRange) {
-        y = env.yOrigin + env.graphHeight * (1 - ((yTick - yMinMAx.min) / yRange));
+    for (var i = 0; i <= numTicks; i++) {
+        y = env.graphMin - env.graphHeight * ((yTick - yMinMAx.min) / yRange);
         if (Math.abs(yTick) < 1.0e-6) {
             yTick = 0;
             drewZero = true;
@@ -421,7 +442,7 @@ function drawYGrid(env, dataKind) {
     }
     if (!drewZero) {
         yTick = 0;
-        y = env.yOrigin + env.graphHeight * (1 - ((0 - yMinMAx.min) / yRange));    
+        y = env.graphMin - env.graphHeight * ((yTick - yMinMAx.min) / yRange);
         drawYGridLine(env, y, yTick.toFixed(digits));
     }
     return yMinMAx;
@@ -435,14 +456,22 @@ function drawXGrid(env, dataArr) {
             if (cd.date)
                 date = cd.date;
         });
+        
+        var tone;
+        var graphMin = env.graphMin;
+        var graphMax = env.graphMax;
+        var x = env.xOrigin + env.graphWidth * (i / dataArr.length);
         if (date.getDay() === 0) {
-            var x = env.xOrigin + env.graphWidth * (i / dataArr.length);
-            env.draw.polyline([[x, env.yOrigin], [x, env.yOrigin + env.graphHeight]]).fill('none').attr(
-            {
-                'stroke-width':'1', 
-                'stroke': 'rgb(128,128,128)' 
-            });
+            tone = 0.75 * 255;
+            env.draw.polyline([[x, graphMin], [x, graphMax]]).fill('none').attr( { 'stroke-width':'1', 'stroke': rgbOf(tone, tone, tone)  });
+        }
+        if (date.getDate() === 1) {
+            tone = 0;
+            env.draw.polyline([[x, graphMin], [x, graphMax]]).fill('none').attr( { 'stroke-width':'1', 'stroke': rgbOf(tone, tone, tone) });
 
+            var label = '' + (date.getMonth() + 1) + '/' + date.getDate();
+            var path = 'M ' + (x - 20) + ' ' + (graphMin + 30) + ' l 0 -30';
+            var text = env.draw.textPath(label, path);
         }
     }    
 }
@@ -466,19 +495,23 @@ function genGraph(dataKind) {
         imageHeight: 800, 
         imageWidth: 800,
         xOrigin: 50, 
-        yOrigin: 25
+        yOrigin: 75
     };
     
     var rightMargin = 50;
-    env.graphHeight = env.imageHeight - env.yOrigin; 
+    var topMargin = 20;
+    env.graphHeight = env.imageHeight - env.yOrigin - topMargin; 
     env.graphWidth = env.imageWidth - env.xOrigin - rightMargin;
+    env.graphMin = env.imageHeight - env.yOrigin;
+    env.graphMax = env.imageHeight - env.yOrigin - env.graphHeight;
+    
 
     var el = document.getElementById(dataKind);
     el.innerHTML = '';
     
     
     env.draw = SVG().addTo('#' + dataKind).size(env.imageWidth, env.imageHeight);
-    env.draw.rect(env.graphWidth, env.graphHeight).attr({ 'fill': 'rgb(235,235,235)' }).move(env.xOrigin, env.yOrigin);
+    env.draw.rect(env.graphWidth, env.graphHeight).attr({ 'fill': 'rgb(235,235,235)' }).move(env.xOrigin, env.graphMax);
     var yMinMAx = drawYGrid(env, dataKind);
     drawXGrid(env, dataArr);
 
@@ -498,7 +531,7 @@ function genGraph(dataKind) {
             if (cd.hasOwnProperty(dataKind))
                 val = cd[dataKind];
             var scaledY = (val - yMin) / yHeight ;
-            var pt = [env.xOrigin + env.graphWidth * (idx / w), env.yOrigin + env.graphHeight * (1 - scaledY)];
+            var pt = [env.xOrigin + env.graphWidth * (idx / w), env.graphMin - env.graphHeight * scaledY];
             points.push(pt);
         });
         idx++;
