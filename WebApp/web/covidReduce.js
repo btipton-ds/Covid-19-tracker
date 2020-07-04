@@ -509,17 +509,27 @@ function genGraph(dataKind) {
     var el = document.getElementById(dataKind);
     el.innerHTML = '';
     
+    var yMinMAx = calRoundedHeight(env.minMax[dataKind]);
+    var yMin = yMinMAx.min;
+    var yHeight = yMinMAx.max - yMinMAx.min;
+    var scaledY;
     
     env.draw = SVG().addTo('#' + dataKind).size(env.imageWidth, env.imageHeight);
-    env.draw.rect(env.graphWidth, env.graphHeight).attr({ 'fill': 'rgb(235,235,235)' }).move(env.xOrigin, env.graphMax);
-    var yMinMAx = drawYGrid(env, dataKind);
+    if (dataKind.toLowerCase().indexOf('slope') != -1) {
+        scaledY = (0 - yMin) / yHeight ;
+        var greenZoneHeight = env.graphHeight * scaledY;
+        var redZoneHeight = env.graphHeight - greenZoneHeight;
+        env.draw.rect(env.graphWidth, redZoneHeight).attr({ 'fill': 'rgb(255,225,225)' }).move(env.xOrigin, env.graphMin - env.graphHeight);
+        env.draw.rect(env.graphWidth, greenZoneHeight).attr({ 'fill': 'rgb(225,255,225)' }).move(env.xOrigin, env.graphMin - greenZoneHeight);
+    } else
+        env.draw.rect(env.graphWidth, env.graphHeight).attr({ 'fill': 'rgb(235,235,235)' }).move(env.xOrigin, env.graphMax);
+        
+    drawYGrid(env, dataKind);
     drawXGrid(env, dataArr);
 
     var polylines = {};
     var idx = 0;
     var w = dataArr.length;
-    var yMin = yMinMAx.min;
-    var yHeight = yMinMAx.max - yMinMAx.min;
     dataArr.forEach(function(data){
         data.forEach(function(cd){
             var countryCode = cd.countryCode;
@@ -530,7 +540,7 @@ function genGraph(dataKind) {
             var val = 0;
             if (cd.hasOwnProperty(dataKind))
                 val = cd[dataKind];
-            var scaledY = (val - yMin) / yHeight ;
+            scaledY = (val - yMin) / yHeight ;
             var pt = [env.xOrigin + env.graphWidth * (idx / w), env.graphMin - env.graphHeight * scaledY];
             points.push(pt);
         });
