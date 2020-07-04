@@ -58,9 +58,9 @@ function updateRadios() {
     var el = document.getElementById('countries');
     el.innerHTML = '<span style="float: left;">Pick Countries: </span>';
     var firstChar = -1;
-    var divBegin = '<span style="float: left; width:20pt;" onmouseleave="onLeaveCountry(this)" onmouseenter="onEnterCountry(this)">';
+    var divBegin = '<span>';
     var alphaDiv = '';
-    var divStyled = '<div style="display:none; position: absolute; background-color: rgb(245,245,255);">';
+    var divStyled = '<div onmouseleave="onLeaveCountry(this)" style="display:none; position: absolute; background-color: rgb(245,245,255);">';
     var pad = '';
     keys.forEach(function(key){
         var checked = selected[key] ? 'checked' : '';
@@ -70,14 +70,14 @@ function updateRadios() {
         if (firstChar === -1) {
             firstChar = curFirst;
             alphaDiv = divBegin;
-            alphaDiv += pad + String.fromCharCode(firstChar).toUpperCase() + pad;
+            alphaDiv += '<button class="letter-button" type="button" onclick="onEnterCountry(this)">' + String.fromCharCode(firstChar).toUpperCase()  + '</button>';
             alphaDiv += divStyled;
         } else if (curFirst !== firstChar) {
             firstChar++;
             if (alphaDiv !== divBegin) {
                 el.innerHTML += alphaDiv;
                 alphaDiv = divBegin;
-                alphaDiv += String.fromCharCode(firstChar).toUpperCase() + '&nbsp;';
+                alphaDiv += '<button type="button" class="letter-button" onclick="onEnterCountry(this)">' + String.fromCharCode(firstChar).toUpperCase()  + '</button>';
                 alphaDiv += divStyled;
             }
         }
@@ -92,14 +92,44 @@ function updateRadios() {
     }
 }
 
+var openPopups = [];
+var popupTimeout = null;
+
+function closePopups() {
+    openPopups.forEach(function(el){
+        el.style.display = 'none';
+    });
+    openPopups = [];    
+}
+
+function keepLastPopupOpen() {
+    if (openPopups.length > 0) {
+    if (popupTimeout)
+        clearTimeout(popupTimeout);
+        openPopups[openPopups.length - 1].style.display = 'unset';
+        popupTimeout = setTimeout(function(){
+            closePopups();
+            popupTimeout = null;
+        }, 3000);
+    }
+}
+
 function onEnterCountry(el) {
-    var sub = el.childNodes[1];
-    sub.style.display = 'unset';
+    if (popupTimeout)
+        clearTimeout(popupTimeout);
+
+    closePopups();
+    var divEl = el.nextElementSibling;
+    divEl.style.display = 'unset';
+    openPopups.push(divEl);
+    popupTimeout = setTimeout(function(){
+        closePopups();
+        popupTimeout = null;
+    }, 3000);
 }
 
 function onLeaveCountry(el) {
-    var sub = el.childNodes[1];
-    sub.style.display = 'none';
+    el.style.display = 'none';
 }
 
 function clearAll() {
@@ -134,6 +164,7 @@ function toggleSelected(codes) {
 }
 
 function onChanged(el) {
+    keepLastPopupOpen();
     var item = el.id;
     selected[item] = !selected[item];
     displayAll();
