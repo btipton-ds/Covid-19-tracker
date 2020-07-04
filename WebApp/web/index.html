@@ -10,14 +10,17 @@
         <script src="data.js"></script>
         <script src="covidReduce.js"></script>
         <style>
-            .title {
+            .title, .page-title {
                 font-family: TimesNewRoman;
                 font-size: 14pt;
                 text-align: center;
                 font-weight: bold;
             }
+            .page-title {
+                font-size: 18pt;
+            }
             .graph {
-                float: left;
+                display: inline-block;
                 border-style: solid;
                 border-width: 1pt;
                 padding: 2pt;
@@ -40,19 +43,48 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 -->
 
     <body onload="onLoad();">
+        <div class='page-title'>
+            <P>Daily Tracking and Trends</P>
+            <P>for</P>
+            <P>Severe Acute Respiratory Syndrome Coronavirus 2 (SARS-CoV-2)</P>
+            <P>Referred to as COVID-19</P>
+        </div>
         <div>
-            By <a href="http://darkskyinnovation.com/covid---public-service.html">Dark Sky Innovative Solutions</a>. <a href="https://github.com/btipton-ds/Covid-19-tracker">Add the code to your site from gitHub.com</a>
+            <ul>
+                <li>The graphs on the left are rolling sums of past data reported by the WHO.</li>
+                <li>A data point is computed for each WHO reporting region for each day.</li>
+                <li>The data point is the sum of the past 7, 14 or 21 days (including the current day).</li>
+                <li>7, 14 and 21 were chosen because each day of the week has different reporting behavior. People don't report the same way on Sundays and Mondays. 
+                    This way, data for each day of the week is equally represented in the sample.</li>
+                <li>The slope graphs on the right are computed using a least squares linear fit.</li>
+                <li>The data point is the slope of the least squares linear fit for the <i>smoothed data</i> for the preceding graph. Not smoothing the data produces
+                unintelligible noise.</li>
+                <li>The number of samples in the slope calculation are equal to the smoothing sample size (7, 14 or 21).</li>
+                <li>This smoothing process allows untrained readers to see the same trends that experienced data analysts can see by looking at the raw data.</li>
+            </ul>
+            <p>
+                <span>For details of the computations click <a href='#Details'> here</a>.</span>
+                <span>By <a href="http://darkskyinnovation.com/covid---public-service.html">Dark Sky Innovative Solutions</a>.</span> 
+                <span>Add the code to your site from <a href="https://github.com/btipton-ds/Covid-19-tracker">gitHub.com</a></span>
+            </p>
         </div>
         <div>
             Smoothing days: <input type="radio" id="days_7" value="7" onchange="daysSmoothingChanged(7)" checked>7
             <input type="radio" id="days_14" value="14" onchange="daysSmoothingChanged(14)">14
             <input type="radio" id="days_21" value="21" onchange="daysSmoothingChanged(21)">21
         </div>
-        <div id="countries" style="float: left;">
+        <div id="countries">
             Loading WHO data file. Please wait.
         </div>
-        <div  style="float: left;"> <button type="button" onclick="clearAll()">Clear All</button></div>
-        <div style="float: left;">
+        <div> <button type="button" onclick="clearAll()">Clear All</button></div>
+        <div>
+            Countries achieving success in: <a href="" onclick="return toggleSelected(['CA', 'DM', 'JM', 'CL']);">Americas</a>, <a href="" onclick="return toggleSelected(['KR', 'JP', 'SG', 'CN', 'TH']);">Asia</a>, <a href="" onclick="return toggleSelected(['BE', 'IT', 'ES', 'DE', 'CH', 'AD', 'FR']);">Europe</a>.
+        </div>
+        <div>
+            Groups: <a href="" onclick="return toggleSelected(['CA', 'US', 'DE', 'IT', 'GB', 'FR', 'JP', 'RU']);">Group of 8</a> 
+            <a href="" onclick="return toggleSelected(['US', 'GB', 'FR', 'JP', 'RU', 'CN', 'DE']);">Major Powers</a>
+        </div>
+        <div>
             <div class="graph">
                 <div class="title">COVID-19 Cases Per Week / 1 Million Population</div>
                 <div id="cases">            
@@ -76,36 +108,30 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 </div>
             </div>
         </div>
-        <div style="float: left; width:600pt;">
-            <P>&nbsp;</P>
-            <P>
-This is basic, low-brow historical rate and trend tracking. There are NO PREDICTIONS of future results.
-            </P>
-            <P>
-However, if you track the slope of case rates curve for your region, your data collection is of 'good quality' and you keep your slope of rates negative for 'long enough,' it is reasonable to expect that your region will enter a maintenance state such as the Republic of Korea or Japan have. Even if your region experienced extremely high rates (such as Andora, Belgium, Italy and Singapore), your region can recover as they have - if you can keep your slope of case rates negative.
-            </P>
-            <p>
-How to keep the slope of case rates negative is up to local citizens, health officials and governments. Dark Sky Innovative solutions does not attempt to give advice on this topic.
-            </P>
-            <p>
-From observation of these historcial trends, the challenge is not deciding when to lock down, but when to open and when to lock down again. 
-The slope of rates graph is a good indicator of when you should or should not reopen. The curve uses the latest data available and the 
-average lags by about 1 week. But if there is a statistically large increase in rates, the curve will show that immediately.
-            </P>
-            <p>
-It is my opinion, that in a crisis with so many unknowns, excess caution and responsiveness are more crucial to success than statistical or mathematical rigor. 
-Severely effected regions simply don't have the time to wait for thorough mathematical analyses. 
-            </P>
-            <p style="color: blue;">
-"If your sample is large enough and selected properly, it will represent the whole well enough for most purposes. If it is not, it may be far less accurate than an 
-intelligent guess and have nothing to recommend it but a spurious air of scientific precision." - How to Lie With Statistics by Darrell Huff copyright 1954.
-            </P>
-            <p>
-The methods I used to construct these curves have served me well for 40 years and have been crucial to successful projects which were being overwhelmed by noisy, dare I say crappy, data.
-            </P>
-            <p>
-Paralysis by analysis can kill when it applies to COVID-19.            
-            </P>
+        <div style="width:600pt;">
+            <a name='Details'>
+                <P class='title'>Details</P>
+                <P>This is fundamental, high school math, historical rate and trend tracking. There are NO PREDICTIONS of future results. 
+                    If you want predictions, see an actuary or bookie.</P>
+                <P>However, if you track the slope of case rates curve for your region, your data collection is of 'good quality' 
+                    and you keep your slope of rates negative for 'long enough,' it is reasonable to expect that your region 
+                    will enter a maintenance state such as the Republic of Korea or Japan have. Even if your region experienced 
+                    extremely high rates (such as Andora, Belgium, Italy and Singapore), your region can recover as they have - 
+                    if you can keep your slope of case rates negative.</P>
+                <p>How to keep the slope of case rates negative is up to local citizens, health officials and governments. 
+                    Dark Sky Innovative solutions does not attempt to give advice on this topic.</P>
+                <p>From observation of these historcial trends, the challenge is not deciding when to lock down, but when to open and when to lock down again. 
+                    The slope of rates graph is a good indicator of when you should or should not reopen. The curve uses the latest data available and the 
+                    average lags by about 1 week. But if there is a statistically large increase in rates, the curve will show that immediately.</P>
+                <p>It is my opinion, that in a crisis with so many unknowns, excess caution and responsiveness are more crucial to success than 
+                    statistical or mathematical rigor. Severely effected regions simply don't have the time to wait for thorough mathematical analyses. </P>
+                <p style="color: blue;">"If your sample is large enough and selected properly, it will represent the whole well enough for most purposes. 
+                    If it is not, it may be far less accurate than an intelligent guess and have nothing to recommend it but a spurious air of scientific precision." 
+                    - How to Lie With Statistics by Darrell Huff copyright 1954.</P>
+                <p>The above quote explains why the actuaries and bookies aren&apos;t able to make predictions. There's not enough history yet</P>
+                <p>The methods I used to construct these curves have served me well for 40 years and have been crucial to successful projects which were being overwhelmed by noisy, dare I say crappy, data.</P>
+                <p>Paralysis by analysis can kill when it applies to COVID-19</P>
+            </a>
         </div>
     </body>
 </html>

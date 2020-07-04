@@ -113,6 +113,26 @@ function clearAll() {
     displayAll();
 }
 
+var lastToggleSelected = [];
+function toggleSelected(codes) {
+    lastToggleSelected.forEach(function(item){
+        var checkEl = document.getElementById(item);
+        if (checkEl)
+            checkEl.checked = false;
+        selected[item] = false;
+    });
+    lastToggleSelected = codes;
+    lastToggleSelected.forEach(function(item){
+        var checkEl = document.getElementById(item);
+        if (checkEl)
+            checkEl.checked = true;
+        selected[item] = true;
+    });
+
+    displayAll();
+    return false;
+}
+
 function onChanged(el) {
     var item = el.id;
     selected[item] = !selected[item];
