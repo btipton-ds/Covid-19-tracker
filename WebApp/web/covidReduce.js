@@ -60,7 +60,7 @@ function updateRadios() {
     var firstChar = -1;
     var divBegin = '<span>';
     var alphaDiv = '';
-    var divStyled = '<div onmouseleave="onLeaveCountry(this)" style="display:none; position: absolute; background-color: rgb(245,245,255);">';
+    var divStyled = '<div onmouseleave="onLeaveCountry(this)" onmousemove="keepLastPopupOpen()" style="display:none; position: absolute; background-color: rgb(245,245,255);">';
     var pad = '';
     keys.forEach(function(key){
         var checked = selected[key] ? 'checked' : '';
