@@ -11,7 +11,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 
 var winSize = 7;
-var gWHORawData = null;
+
 var selected = {
     'PH': false,
     'KR': false,

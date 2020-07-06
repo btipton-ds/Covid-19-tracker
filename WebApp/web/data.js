@@ -24,28 +24,39 @@ function sleep(milliseconds) {
   } while (currentDate - date < milliseconds);
 }
 
-async function readData() {
-  await $.ajax('WHO-COVID-19-global-data.csv', 
+function readData() {
+  $.ajax('WHO-COVID-19-global-data.csv', 
     {
         mimeType : '"text/html"',
         dataType :'text'
-    }
-          ).then(function (data){
-        gWHORawData = data;
+    }).then(function (data){
+        processWHOData(data);
+        readUSAData();
+//        begin();
+    });
+    
+}
+
+var gWorldDataMap = {};
+
+async function readUSAData() {
+  await $.ajax('https://covidtracking.com/api/v1/states/daily.json', 
+    {
+        mimeType : '"text/json"',
+        dataType :'json'
+    }).then(function (data){
+        processUSAData(data);
         begin();
     });
     
 }
 
-var whoDataMap = null;
-
 function getData() {
-    if (!gWHORawData)
-        return;
-    if (whoDataMap)
-        return whoDataMap;
-    var whoDataMap = {};
-    var entries = gWHORawData.split("\n");
+    return gWorldDataMap;
+}
+
+function processWHOData(data) {
+    var entries = data.split("\n");
     entries.forEach(function(str){
         if (str.indexOf('Date_reported') !== -1)
             return;
@@ -67,7 +78,7 @@ function getData() {
             str = str.substring(str.indexOf(',') + 1);
 
         var fields = str.split(",");
-        if (!whoDataMap.hasOwnProperty(countryCode)) {
+        if (!gWorldDataMap.hasOwnProperty(countryCode)) {
             var pop = 1;
             var found = false;
             if (populationLUT.hasOwnProperty(name)) {
@@ -93,7 +104,7 @@ function getData() {
                 region: fields[0], 
                 data: []
             };
-            whoDataMap[countryCode] = data;
+            gWorldDataMap[countryCode] = data;
         }
         var entry = {
             date: dateOf(dateStr),
@@ -101,7 +112,69 @@ function getData() {
             dailyDeaths: fields[3]
         };
 
-        whoDataMap[countryCode].data.push(entry);
+        gWorldDataMap[countryCode].data.push(entry);
     });
-    return whoDataMap;
+    return gWorldDataMap;
+}
+
+function processUSAData(data) {
+    data.forEach(function(entry){
+        var state = entry.state;
+        if (str.indexOf('Date_reported') !== -1)
+            return;
+        
+        var dateStr = str.substring(0, str.indexOf(","));
+        str = str.substring(str.indexOf(",") + 1);
+        
+        var countryCode = str.substring(0, str.indexOf(","));
+        str = str.substring(str.indexOf(",") + 1);
+        
+        var name = '';
+        if (str.indexOf('"') == 0) {
+            str = str.substring(1);
+            name = str.substring(0, str.indexOf('"'));
+            str = str.substring(str.indexOf('"') + 1);
+        } else {
+            name = str.substring(0, str.indexOf(','));
+        }
+            str = str.substring(str.indexOf(',') + 1);
+
+        var fields = str.split(",");
+        if (!gWorldDataMap.hasOwnProperty(countryCode)) {
+            var pop = 1;
+            var found = false;
+            if (populationLUT.hasOwnProperty(name)) {
+                pop = populationLUT[name];
+                found = true;
+            } else {
+                var popKeys = Object.keys(populationLUT);
+                popKeys.forEach(function(popKey){
+                    if (popKey.includes(name) || name.includes(popKey)) {
+                        pop = populationLUT[popKey];
+                        found = true;
+                    }
+                });
+            }
+            if (found)
+                pop /= 1.0e6;
+//            else
+//                console.error('Missing country name ' + name);
+
+            var data = {
+                name: name,
+                population: pop, 
+                region: fields[0], 
+                data: []
+            };
+            gWorldDataMap[countryCode] = data;
+        }
+        var entry = {
+            date: dateOf(dateStr),
+            dailyCases: fields[1],
+            dailyDeaths: fields[3]
+        };
+
+        gWorldDataMap[countryCode].data.push(entry);
+    });
+    return gWorldDataMap;
 }
