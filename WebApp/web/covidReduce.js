@@ -560,16 +560,22 @@ function drawXGrid(env, dataArr) {
         var graphMin = env.graphMin;
         var graphMax = env.graphMax;
         var x = env.xOrigin + env.graphWidth * (i / dataArr.length);
+        var baseLine = 12;
         if (date.getDay() === 0) {
             tone = 0.75 * 255;
             env.draw.polyline([[x, graphMin], [x, graphMax]]).fill('none').attr( { 'stroke-width':'1', 'stroke': rgbOf(tone, tone, tone)  });
+
+            var label = '' + date.getDate();
+            var path = 'M ' + (x - baseLine) + ' ' + (graphMin + 20) + ' l 0 -30';
+            var text = env.draw.textPath(label, path).font({ size: 11 });
         }
+
         if (date.getDate() === 1) {
             tone = 0;
             env.draw.polyline([[x, graphMin], [x, graphMax]]).fill('none').attr( { 'stroke-width':'1', 'stroke': rgbOf(tone, tone, tone) });
 
             var label = '' + (date.getMonth() + 1) + '/' + date.getDate();
-            var path = 'M ' + (x - 20) + ' ' + (graphMin + 30) + ' l 0 -30';
+            var path = 'M ' + (x - baseLine) + ' ' + (graphMin + 50) + ' l 0 -30';
             var text = env.draw.textPath(label, path);
         }
     }    
