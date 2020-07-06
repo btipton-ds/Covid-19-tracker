@@ -118,63 +118,46 @@ function processWHOData(data) {
 }
 
 function processUSAData(data) {
-    data.forEach(function(entry){
-        var state = entry.state;
-        if (str.indexOf('Date_reported') !== -1)
+    data.forEach(function(stateData){
+        if (!usaPopulationLUT.hasOwnProperty(stateData.state)) {
             return;
-        
-        var dateStr = str.substring(0, str.indexOf(","));
-        str = str.substring(str.indexOf(",") + 1);
-        
-        var countryCode = str.substring(0, str.indexOf(","));
-        str = str.substring(str.indexOf(",") + 1);
-        
-        var name = '';
-        if (str.indexOf('"') == 0) {
-            str = str.substring(1);
-            name = str.substring(0, str.indexOf('"'));
-            str = str.substring(str.indexOf('"') + 1);
-        } else {
-            name = str.substring(0, str.indexOf(','));
         }
-            str = str.substring(str.indexOf(',') + 1);
+        var countryCode = 'US_' + stateData.state;
+        var dateNum = stateData.date;
+        var year = Math.trunc(dateNum / 10000);
+        dateNum = dateNum - (year * 10000);
+        var month = Math.trunc(dateNum / 100);
+        var day = dateNum - (month * 100);
 
-        var fields = str.split(",");
         if (!gWorldDataMap.hasOwnProperty(countryCode)) {
-            var pop = 1;
-            var found = false;
-            if (populationLUT.hasOwnProperty(name)) {
-                pop = populationLUT[name];
-                found = true;
-            } else {
-                var popKeys = Object.keys(populationLUT);
-                popKeys.forEach(function(popKey){
-                    if (popKey.includes(name) || name.includes(popKey)) {
-                        pop = populationLUT[popKey];
-                        found = true;
-                    }
-                });
-            }
-            if (found)
-                pop /= 1.0e6;
-//            else
-//                console.error('Missing country name ' + name);
-
+            var pop = usaPopulationLUT[stateData.state].pop / 1.0e6;
+            
             var data = {
-                name: name,
+                name: usaPopulationLUT[stateData.state].name,
                 population: pop, 
-                region: fields[0], 
+                region: 'US', 
                 data: []
             };
             gWorldDataMap[countryCode] = data;
         }
+
         var entry = {
-            date: dateOf(dateStr),
-            dailyCases: fields[1],
-            dailyDeaths: fields[3]
+            date: new Date(year, month - 1, day),
+            dailyCases: stateData.positiveIncrease,
+            dailyDeaths: stateData.deathIncrease
         };
 
         gWorldDataMap[countryCode].data.push(entry);
+
     });
+    
+    var keys = Object.keys(gWorldDataMap);
+    keys.forEach(function(key){
+        var state = gWorldDataMap[key];
+        state.data.sort(function(a, b){
+            return a.date - b.date;
+        });
+    });
+
     return gWorldDataMap;
 }
