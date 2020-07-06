@@ -39,7 +39,8 @@ function onLoad() {
 
 function begin() {
     winSize = 7;
-    updateRadios();
+    updateCountryRadios();
+    updateUSAStateRadios();
     setSmoothingDays();
     displayAll();    
 }
@@ -51,18 +52,21 @@ function displayAll() {
     displayData('deathSlope');
 }
 
-function updateRadios() {
+function updateCountryRadios() {
     var dataSet = getData();
     var keys = Object.keys(dataSet);
     
     var el = document.getElementById('countries');
-    el.innerHTML = '<span style="float: left;">Pick Countries: </span>';
+    el.innerHTML = '<span class="picker">Pick Countries: </span>';
     var firstChar = -1;
     var divBegin = '<span>';
     var alphaDiv = '';
     var divStyled = '<div onmouseleave="onLeaveCountry(this)" onmousemove="keepLastPopupOpen()" style="display:none; position: absolute; background-color: rgb(245,245,255);">';
     var pad = '';
+    var lastName = '';
     keys.forEach(function(key){
+        if (key.indexOf('US_') !== -1)
+            return;
         var checked = selected[key] ? 'checked' : '';
 
         var cd = dataSet[key];
@@ -73,7 +77,51 @@ function updateRadios() {
             alphaDiv += '<button class="letter-button" type="button" onclick="onEnterCountry(this)">' + String.fromCharCode(firstChar).toUpperCase()  + '</button>';
             alphaDiv += divStyled;
         } else if (curFirst !== firstChar) {
-            firstChar++;
+            firstChar = curFirst;
+            if (alphaDiv !== divBegin) {
+                el.innerHTML += alphaDiv;
+                alphaDiv = divBegin;
+                alphaDiv += '<button type="button" class="letter-button" onclick="onEnterCountry(this)">' + String.fromCharCode(firstChar).toUpperCase()  + '</button>';
+                alphaDiv += divStyled;
+            }
+        }
+
+        lastName = cd.name;
+        alphaDiv += '<div>';
+        alphaDiv += '<input id="' + key + '" type="checkbox" onchange="onChanged(this)" ' + checked + '>';
+        alphaDiv += '<label for="' + key + '">' + cd.name + '</label>';
+    });
+    
+    if (alphaDiv !== divBegin && lastName !== '') {
+        el.innerHTML += alphaDiv;
+    }
+}
+
+function updateUSAStateRadios() {
+    var dataSet = getData();
+    var keys = Object.keys(dataSet);
+    
+    var el = document.getElementById('usa_states');
+    el.innerHTML = '<span class="picker">Pick US States: </span>';
+    var firstChar = -1;
+    var divBegin = '<span>';
+    var alphaDiv = '';
+    var divStyled = '<div onmouseleave="onLeaveCountry(this)" onmousemove="keepLastPopupOpen()" style="display:none; position: absolute; background-color: rgb(245,245,255);">';
+    var pad = '';
+    keys.forEach(function(key){
+        if (key.indexOf('US_') === -1)
+            return;
+        var checked = selected[key] ? 'checked' : '';
+
+        var cd = dataSet[key];
+        var curFirst = cd.name.toLowerCase().charCodeAt(0);
+        if (firstChar === -1) {
+            firstChar = curFirst;
+            alphaDiv = divBegin;
+            alphaDiv += '<button class="letter-button" type="button" onclick="onEnterCountry(this)">' + String.fromCharCode(firstChar).toUpperCase()  + '</button>';
+            alphaDiv += divStyled;
+        } else if (curFirst !== firstChar) {
+            firstChar = curFirst;
             if (alphaDiv !== divBegin) {
                 el.innerHTML += alphaDiv;
                 alphaDiv = divBegin;

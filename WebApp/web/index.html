@@ -28,7 +28,14 @@
                 box-shadow: 2px 4px gray;
             }
             .letter-button {
-                width: 50px;
+                width: 30px;
+                margin: 1pt 2pt;
+                box-shadow: 1px 2px gray;
+            }
+            .picker {
+                width: 90pt;
+                display: inline-block;
+                font-weight: bold;
             }
         </style>
     </head>
@@ -72,12 +79,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             </p>
         </div>
         <div>
-            Smoothing days: <input type="radio" id="days_7" value="7" onchange="daysSmoothingChanged(7)" checked>7
+            <span class="picker">Smoothing days:</span><input type="radio" id="days_7" value="7" onchange="daysSmoothingChanged(7)" checked>7
             <input type="radio" id="days_14" value="14" onchange="daysSmoothingChanged(14)">14
             <input type="radio" id="days_21" value="21" onchange="daysSmoothingChanged(21)">21
         </div>
         <div id="countries">
-            Loading WHO data file. Please wait.
+            Loading WHO data. Please wait.
+        </div>
+        <div id="usa_states">
+            Loading USA states data. Please wait.
         </div>
         <div> <button type="button" onclick="clearAll()">Clear All</button></div>
         <div>
