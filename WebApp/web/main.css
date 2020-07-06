@@ -1,0 +1,44 @@
+.body_text, .notes{
+    width: 800px;
+}
+
+.notes{
+    font-size: 10pt;
+    font-style: italic;
+}
+
+.title, .page-title {
+    font-family: TimesNewRoman;
+    font-size: 14pt;
+    text-align: center;
+    font-weight: bold;
+}
+
+.page-title {
+    font-size: 18pt;
+}
+
+.graph {
+    display: inline-block;
+    border-style: solid;
+    border-width: 1pt;
+    padding: 2pt;
+    margin: 2pt;
+    box-shadow: 2px 4px gray;
+}
+
+.letter-button, .clear-button {
+    width: 30px;
+    margin: 1pt 2pt;
+    box-shadow: 1px 2px gray;
+}
+
+.clear-button {
+    width: 90px;
+}
+
+.picker {
+    width: 90pt;
+    display: inline-block;
+    font-weight: bold;
+}
