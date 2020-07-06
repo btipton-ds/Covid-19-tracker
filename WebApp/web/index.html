@@ -10,6 +10,13 @@
         <script src="data.js"></script>
         <script src="covidReduce.js"></script>
         <style>
+            .body_text, .notes{
+                width: 800px;
+            }
+            .notes{
+                font-size: 10pt;
+                font-style: italic;
+            }
             .title, .page-title {
                 font-family: TimesNewRoman;
                 font-size: 14pt;
@@ -27,11 +34,17 @@
                 margin: 2pt;
                 box-shadow: 2px 4px gray;
             }
-            .letter-button {
+
+            .letter-button, .clear-button {
                 width: 30px;
                 margin: 1pt 2pt;
                 box-shadow: 1px 2px gray;
             }
+
+            .clear-button {
+                width: 90px;
+            }
+
             .picker {
                 width: 90pt;
                 display: inline-block;
@@ -61,13 +74,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         </div>
         <div>
             <ul>
-                <li>The graphs on the left are rolling sums of past data reported by the WHO.</li>
+                <li>The graphs on the left are rolling sums of past data reported by the WHO and <a href="https://covidtracking.com/">The Covid Tracking Project</a>.</li>
+                <li>They are normalized by the reporting region's population. This provides people all over the world with a common value for 
+                    goal setting and reporting<a href="#note_1">*</a>. 
+                    It also allows the data to be compared.</li>
                 <li>A data point is computed for each WHO reporting region for each day.</li>
                 <li>The data point is the sum of the past 7, 14 or 21 days (including the current day).</li>
                 <li>7, 14 and 21 were chosen because each day of the week has different reporting behavior. People don't report the same way on Sundays and Mondays. 
                     This way, data for each day of the week is equally represented in the sample.</li>
-                <li>The slope graphs on the right are computed using a least squares linear fit.</li>
-                <li>The data point is the slope of the least squares linear fit for the <i>smoothed data</i> for the preceding graph. Not smoothing the data produces
+                <li>On the right are Normalized Cases Rate Slope (NCRS) or Normalized Death Rate Slope (NDRS) graphs.
+                    These are computed using a least squares linear fit of the normalized weekly rate data.</li>
+                <li>The data point is the slope of the least squares linear fit for the <i>smoothed data</i> taken from the preceding graph. Not smoothing the data produces
                 unintelligible noise.</li>
                 <li>The number of samples in the slope calculation are equal to the smoothing sample size (7, 14 or 21).</li>
                 <li>This smoothing process allows untrained readers to see the same trends that experienced data analysts can see by looking at the raw data.</li>
@@ -76,6 +93,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 <span>For details of the computations click <a href='#Details'> here</a>.</span>
                 <span>By <a href="http://darkskyinnovation.com/covid---public-service.html">Dark Sky Innovative Solutions</a>.</span> 
                 <span>Add the code to your site from <a href="https://github.com/btipton-ds/Covid-19-tracker">gitHub.com</a></span>
+                <span>US State data provided by <a href="https://covidtracking.com/">The Covid Tracking Project</a></span>
             </p>
         </div>
         <div>
@@ -89,7 +107,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <div id="usa_states">
             Loading USA states data. Please wait.
         </div>
-        <div> <button type="button" onclick="clearAll()">Clear All</button></div>
+        <div><span class="picker"></span><button type="button" class="clear-button" onclick="clearAll()">Clear All</button></div>
         <div>
             Countries achieving success in: <a href="" onclick="return toggleSelected(['CA', 'DM', 'JM', 'CL']);">Americas</a>, <a href="" onclick="return toggleSelected(['KR', 'JP', 'SG', 'CN', 'TH']);">Asia</a>, <a href="" onclick="return toggleSelected(['BE', 'IT', 'ES', 'DE', 'CH', 'AD', 'FR']);">Europe</a>.
         </div>
@@ -104,7 +122,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 </div>
             </div>
             <div class="graph">
-                <div class="title">COVID-19 Slope of Cases Per Week / 1 Million Population</div>
+                <div class="title">COVID-19 NCRS</div>
                 <div id="caseSlope">            
                 </div>
             </div>
@@ -116,12 +134,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 </div>
             </div>
             <div class="graph">
-                <div class="title">COVID-19 Slope of Deaths Per Week / 1 Million Population</div>
+                <div class="title">COVID-19 NDRS</div>
                 <div id="deathSlope">            
                 </div>
             </div>
         </div>
-        <div style="width:600pt;">
+        <div class="body_text">
             <a name='Details'>
                 <P class='title'>Details</P>
                 <P>This is fundamental, high school math, historical rate and trend tracking. There are NO PREDICTIONS of future results. 
@@ -146,6 +164,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 <p>Paralysis by analysis can kill when it applies to COVID-19</P>
                 <P>Bob Tipton - <a href='http://darkskyinnovation.com/'>Founder Dark Sky Innovative Solutions</a></P>
             </a>
+        </div>
+        <div class="notes">
+            <a name='note_1'>* Based on my observations and a SWAG (Scientific Wild Assed Guess). Thailand, The Republic of Korea and Japan are 
+                currently in the best maintenance situation. They are all maintaining Normalized New Case Rate (NNCR) values below 10 new 
+                cases / million / week. In my opinion, a region is not stable until their NNCR is under 10. There is no scientific basis for 
+                this opinion except hours of reading, number crunching and observation.</a>
         </div>
     </body>
 </html>
