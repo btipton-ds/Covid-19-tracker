@@ -18,12 +18,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="jquery-3.5.1.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
-        <script src="population.js"></script>
-        <script src="data.js"></script>
-        <script src="covidReduce.js"></script>
+        <script src="population.js?v=1"></script>
+        <script src="data.js?v=1"></script>
+        <script src="covidReduce.js?v=1"></script>
         <link rel="stylesheet" type="text/css" href="main.css">
     </head>
-
 
     <body onload="onLoad();">
         <div class='page-title'>
@@ -34,7 +33,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <div>
             <ul>
                 <li>The graphs on the left are rolling sums of past data reported by the WHO and <a href="https://covidtracking.com/">The Covid Tracking Project</a>.</li>
-                <li>They are normalized by the reporting region's population. This provides people all over the world with a common value for 
+                <li>They are normalized by the reporting region's <b>population in millions</b>. This provides people all over the world with a common value for 
                     goal setting and reporting<a href="#note_1">*</a>. 
                     It also allows the data to be compared.</li>
                 <li>A data point is computed for each WHO reporting region for each day.</li>
@@ -76,7 +75,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         </div>
         <div>
             <div class="graph">
-                <div class="title">COVID-19 Cases Per Week / 1 Million Population</div>
+                <div class="title">COVID-19 Normalized Weekly Cases</div>
                 <div id="cases">            
                 </div>
             </div>
@@ -88,13 +87,25 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         </div>
         <div>
             <div class="graph">
-                <div class="title">COVID-19 Deaths Per Week / 1 Million Population</div>
+                <div class="title">COVID-19 Normalized Weekly Deaths</div>
                 <div id="deaths">            
                 </div>
             </div>
             <div class="graph">
                 <div class="title">COVID-19 NDRS</div>
                 <div id="deathSlope">            
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="graph">
+                <div class="title">COVID-19 Normalized Average Hospitalized<a href="#note_2">**</a><br>Current cost estimates are about $7,000/day per patient.<a href="#note_3">***</a></div>
+                <div id="hospitalized">            
+                </div>
+            </div>
+            <div class="graph">
+                <div class="title">COVID-19 Normalized Average Hospitalized Slope</div>
+                <div id="hospitalizedSlope">            
                 </div>
             </div>
         </div>
@@ -106,11 +117,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 <P>However, if you track the slope of case rates curve for your region, your data collection is of 'good quality' 
                     and you keep your slope of rates negative for 'long enough,' it is reasonable to expect that your region 
                     will enter a maintenance state such as the Republic of Korea or Japan have. Even if your region experienced 
-                    extremely high rates (such as Andora, Belgium, Italy and Singapore), your region can recover as they have - 
+                    extremely high rates (such as Andorra, Belgium, Italy and Singapore), your region can recover as they have - 
                     if you can keep your slope of case rates negative.</P>
                 <p>How to keep the slope of case rates negative is up to local citizens, health officials and governments. 
                     Dark Sky Innovative solutions does not attempt to give advice on this topic.</P>
-                <p>From observation of these historcial trends, the challenge is not deciding when to lock down, but when to open and when to lock down again. 
+                <p>From observation of these historical trends, the challenge is not deciding when to lock down, but when to open and when to lock down again. 
                     The slope of rates graph is a good indicator of when you should or should not reopen. The curve uses the latest data available and the 
                     average lags by about 1 week. But if there is a statistically large increase in rates, the curve will show that immediately.</P>
                 <p>It is my opinion, that in a crisis with so many unknowns, excess caution and responsiveness are more crucial to success than 
@@ -118,17 +129,32 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 <p style="color: blue;">"If your sample is large enough and selected properly, it will represent the whole well enough for most purposes. 
                     If it is not, it may be far less accurate than an intelligent guess and have nothing to recommend it but a spurious air of scientific precision." 
                     - How to Lie With Statistics by Darrell Huff copyright 1954.</P>
-                <p>The above quote explains why the actuaries and bookies aren&apos;t able to make predictions. There's not enough history yet</P>
+                <p>The above quote explains why the actuaries and bookies aren&apos;t able to make predictions. There's not enough history yet.</P>
                 <p>The methods I used to construct these curves have served me well for 40 years and have been crucial to successful projects which were being overwhelmed by noisy, dare I say crappy, data.</P>
                 <p>Paralysis by analysis can kill when it applies to COVID-19</P>
                 <P>Bob Tipton - <a href='http://darkskyinnovation.com/'>Founder Dark Sky Innovative Solutions</a></P>
             </a>
         </div>
         <div class="notes">
-            <a name='note_1'>* Based on my observations and a SWAG (Scientific Wild Assed Guess). Thailand, The Republic of Korea and Japan are 
+            <P>
+                <a name='note_1'>* Based on my observations and a SWAG (Scientific Wild Assed Guess). Thailand, The Republic of Korea and Japan are 
                 currently in the best maintenance situation. They are all maintaining Normalized New Case Rate (NNCR) values below 10 new 
                 cases / million / week. In my opinion, a region is not stable until their NNCR is under 10. There is no scientific basis for 
                 this opinion except hours of reading, number crunching and observation.</a>
+            </P>
+            <P>
+                <a name='note_2'>** Hospital data is processed differently and of very low reliability, not provided for countries nor by the US states of Florida, Hawaii, Idaho, and Kansas.
+                    Hospital data is the rolling average of the number of people in the hospital due to COVID-19 divided by the state's population in millions.
+                 One obvious discrepancy is that New York state has continuing deaths, ~800 people in the hospital but zero admitted to the hospital for several weeks.</a>
+            </P>
+            <P>
+                <a name='note_3'>*** Not controlling COVID-19 has a cost also. Current estimates are about $6,000 to $8,000 per patient per day. Take the current number
+                    on this graph, multiply it by about $7,000 <b>then multiply that</b> by the population and that is what that state is spending per day for COVID-19 treatment. Early in the Pandemic, the WHO reported
+                that COVID-19 had a low death rate when properly treated. They made no statement about the cost of that treatment to the community.<br>
+                On July 7, Texas had about 260 patients / million in the hospital. With a population of about 29 million that yields $52,780,000 / day. 
+                And that number is rising.<br>
+                The USA has had a very low fatality rate relative to other countries - but the US is paying a price for it.</a>
+            </P>
         </div>
     </body>
 </html>

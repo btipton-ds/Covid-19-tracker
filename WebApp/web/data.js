@@ -108,8 +108,9 @@ function processWHOData(data) {
         }
         var entry = {
             date: dateOf(dateStr),
-            dailyCases: fields[1],
-            dailyDeaths: fields[3]
+            dailyCases: Number(fields[1]),
+            dailyDeaths: Number(fields[3]),
+            dailyHospitalized: 0
         };
 
         gWorldDataMap[countryCode].data.push(entry);
@@ -144,7 +145,8 @@ function processUSAData(data) {
         var entry = {
             date: new Date(year, month - 1, day),
             dailyCases: stateData.positiveIncrease,
-            dailyDeaths: stateData.deathIncrease
+            dailyDeaths: stateData.deathIncrease,
+            dailyHospitalized: stateData.hospitalizedCurrently
         };
 
         gWorldDataMap[countryCode].data.push(entry);

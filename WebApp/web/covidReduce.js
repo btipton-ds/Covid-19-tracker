@@ -48,6 +48,8 @@ function begin() {
 function displayAll() {
     displayData('cases');
     displayData('caseSlope');
+    displayData('hospitalized')
+    displayData('hospitalizedSlope')
     displayData('deaths');
     displayData('deathSlope');
 }
@@ -253,14 +255,16 @@ function computeAverages(data, keys, selArr, idx, pop, result) {
     for (var i = 0; i < data.length; i++) {
         var sumCases = 0;
         var sumDeaths = 0;
+        var sumHospitalized = 0;
         var steps = winSize;
         if (i < winSize)
             steps = i;
         for (var j = 0; j < steps; j++) {
             var dataIdx = i + j - (steps - 1);
             var d = data[dataIdx];
-            sumCases += Number(d.dailyCases) / pop;
-            sumDeaths += Number(d.dailyDeaths) / pop;
+            sumCases += d.dailyCases / pop;
+            sumDeaths += d.dailyDeaths / pop;
+            sumHospitalized += d.dailyHospitalized / pop;
         }
 
         var t = data[i].date.getTime();
@@ -268,18 +272,26 @@ function computeAverages(data, keys, selArr, idx, pop, result) {
             var arr = [];
             for (var j = 0; j < selArr.length; j++) {
                 arr.push({
+                    valid: false,
                     'date': data[i].date,
                     'countryCode': selArr[j], 
                     'cases': 0, 
                     'deaths': 0,
+                    'hospitalized' : 0
                 });
             }
             result[t] = arr;
         }
 
         var entry = result[t][idx];
+        entry.valid = true;
         entry.cases = sumCases * scale; 
         entry.deaths = sumDeaths * scale;
+        if (steps > 0)
+            entry.hospitalized = sumHospitalized / steps * scale;
+        else 
+            entry.hospitalized = 0;
+            
     }
     
 }
@@ -294,9 +306,9 @@ function computeSlopes(dataArr) {
     for (var i = 0; i < numSel; i++) {
         for (var j = 0; j < dataArr.length; j++) {
             var entry = dataArr[j][i];
-            var caseAvg = 0, deathAvg = 0;
-            var caseNumer = 0, denom = 0;
-            var deathNumer = 0;
+            var caseAvg = 0, deathAvg = 0, hospitalizedAvg = 0;
+            var denom = 0;
+            var caseNumer = 0, deathNumer = 0, hospitalizedNumer = 0;
             var steps = winSize;
             if (j < winSize)
                 steps = j;
@@ -305,24 +317,29 @@ function computeSlopes(dataArr) {
                     var idx = j - (steps - 1) + k;
                     caseAvg += dataArr[idx][i].cases;
                     deathAvg += dataArr[idx][i].deaths;
+                    hospitalizedAvg += dataArr[idx][i].hospitalized;
                 }
 
                 caseAvg /= steps;
                 deathAvg /= steps;
+                hospitalizedAvg /= steps;
 
                 var avgX = steps / 2.0;
                 for (var k = 0; k < steps; k++) {
                     var idx = j - (steps - 1) + k;
                     caseNumer += (k - avgX) * (dataArr[idx][i].cases - caseAvg);
                     deathNumer += (k - avgX) * (dataArr[idx][i].deaths - deathAvg);
+                    hospitalizedNumer += (k - avgX) * (dataArr[idx][i].hospitalized - hospitalizedAvg);
 
                     denom += (k - avgX) * (k - avgX);
                 }
                 entry.caseSlope = caseNumer / denom;
                 entry.deathSlope = deathNumer / denom;
+                entry.hospitalizedSlope = hospitalizedNumer / denom;
             } else {
                 entry.caseSlope = 0;
                 entry.deathSlope = 0;
+                entry.hospitalizedSlope = 0;
             }
         }
     }
@@ -374,9 +391,11 @@ function getMinMax(data) {
     var result = {
         minDate: new Date(Date.now()),
         cases: {min: 0, max: -1.0e20 },
+        hospitalized: {min: 0, max: -1.0e20 },
         deaths: {min: 0, max: -1.0e20 },
         caseSlope: {min: 1.0e20, max: -1.0e20 },
-        deathSlope: {min: 1.0e20, max: -1.0e20 }
+        deathSlope: {min: 1.0e20, max: -1.0e20 },
+        hospitalizedSlope: {min: 0, max: -1.0e20 }
     };
     
     var entries = Object.keys(data);
@@ -390,9 +409,15 @@ function getMinMax(data) {
             if (entryTime < minTime) {
                 result.minDate = ed.date;
             }
+
             if (ed.cases > result.cases.max) {
                 result.cases.max = ed.cases;
             }
+
+            if (ed.hospitalized > result.hospitalized.max) {
+                result.hospitalized.max = ed.hospitalized;
+            }
+
             if (ed.deaths > result.deaths.max) {
                 result.deaths.max = ed.deaths;
             }
@@ -402,6 +427,13 @@ function getMinMax(data) {
             }
             if (ed.caseSlope < result.caseSlope.min) {
                 result.caseSlope.min = ed.caseSlope;
+            }
+
+            if (ed.hospitalizedSlope > result.hospitalizedSlope.max) {
+                result.hospitalizedSlope.max = ed.hospitalizedSlope;
+            }
+            if (ed.hospitalizedSlope < result.hospitalizedSlope.min) {
+                result.hospitalizedSlope.min = ed.hospitalizedSlope;
             }
 
             if (ed.deathSlope > result.deathSlope.max) {
@@ -454,7 +486,11 @@ function colorOf(idx) {
 }
 
 function calRoundedHeight0(val) {
-    if (val > 2000)
+    if (val > 5000)
+        return Math.round((val + 999) / 1000) * 1000;
+    else if (val > 2000)
+        return Math.round((val + 499) / 500) * 500;
+    else if (val > 1000)
         return Math.round((val + 199) / 200) * 200;
     else if (val > 500)
         return Math.round((val + 99) / 100) * 100;
@@ -499,8 +535,11 @@ function drawYGridLine(env, y, label) {
         });
 
         var text = env.draw.text(function(add) {
-          add.tspan(label).dy(y);
-        });
+          add.tspan(label + '/m').dy(y);
+        }).font({
+        family:   'TimesNewRoman',
+        size:     '11pt'
+    });
 }
 
 function drawYGrid(env, dataKind) {
@@ -637,6 +676,8 @@ function genGraph(dataKind) {
     var w = dataArr.length;
     dataArr.forEach(function(data){
         data.forEach(function(cd){
+            if (!cd.valid)
+                return;
             var countryCode = cd.countryCode;
             if (!polylines.hasOwnProperty(countryCode)) {
                 polylines[countryCode] = [];
@@ -667,8 +708,8 @@ function genGraph(dataKind) {
             idx++;
         });
     }).font({
-        family:   'TimesNewRoman'
-      , size:     20
+        family:   'TimesNewRoman',
+        size:     20
     });
 
     idx  = 0;
