@@ -301,37 +301,52 @@ function computeSlopes(dataArr) {
         return;
 
     var d = dataArr;
+    var weightEl = document.getElementById('weight');
+    var minWeight = weightEl ? Number(weightEl.value) : 1;
+    var maxWeight = 1.0;
+
     // inver the loop
     var numSel = d[0].length;
     for (var i = 0; i < numSel; i++) {
         for (var j = 0; j < dataArr.length; j++) {
             var entry = dataArr[j][i];
             var caseAvg = 0, deathAvg = 0, hospitalizedAvg = 0;
+            var weightSum = 0;
             var denom = 0;
             var caseNumer = 0, deathNumer = 0, hospitalizedNumer = 0;
+            var t, weight;
             var steps = winSize;
             if (j < winSize)
                 steps = j;
             if (steps > 0) {
                 for (var k = 0; k < steps; k++) {
                     var idx = j - (steps - 1) + k;
-                    caseAvg += dataArr[idx][i].cases;
-                    deathAvg += dataArr[idx][i].deaths;
-                    hospitalizedAvg += dataArr[idx][i].hospitalized;
+                    t =  (k + 1) / steps;
+                    weight = minWeight + (maxWeight - minWeight) * t;
+                    weightSum += weight;
+
+                    caseAvg += dataArr[idx][i].cases * weight;
+                    deathAvg += dataArr[idx][i].deaths * weight;
+                    hospitalizedAvg += dataArr[idx][i].hospitalized * weight;
                 }
 
-                caseAvg /= steps;
-                deathAvg /= steps;
-                hospitalizedAvg /= steps;
+                caseAvg /= weightSum;
+                deathAvg /= weightSum;
+                hospitalizedAvg /= weightSum;
 
                 var avgX = steps / 2.0;
                 for (var k = 0; k < steps; k++) {
                     var idx = j - (steps - 1) + k;
-                    caseNumer += (k - avgX) * (dataArr[idx][i].cases - caseAvg);
-                    deathNumer += (k - avgX) * (dataArr[idx][i].deaths - deathAvg);
-                    hospitalizedNumer += (k - avgX) * (dataArr[idx][i].hospitalized - hospitalizedAvg);
+                    t =  (k + 1) / steps;
+                    weight = minWeight + (maxWeight - minWeight) * t;
+                    weightSum += weight;
 
-                    denom += (k - avgX) * (k - avgX);
+                    var x = (k - avgX) * weight;
+                    caseNumer += x * (dataArr[idx][i].cases - caseAvg) * weight;
+                    deathNumer += x * (dataArr[idx][i].deaths - deathAvg) * weight;
+                    hospitalizedNumer += x * (dataArr[idx][i].hospitalized - hospitalizedAvg) * weight;
+
+                    denom += x * x;
                 }
                 entry.caseSlope = caseNumer / denom;
                 entry.deathSlope = deathNumer / denom;

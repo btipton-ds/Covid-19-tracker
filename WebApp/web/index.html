@@ -20,7 +20,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
         <script src="population.js?v=1"></script>
         <script src="data.js?v=1"></script>
-        <script src="covidReduce.js?v=1"></script>
+        <script src="covidReduce.js?v=2"></script>
         <link rel="stylesheet" type="text/css" href="main.css">
     </head>
 
@@ -53,6 +53,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 <span>Add the code to your site from <a href="https://github.com/btipton-ds/Covid-19-tracker">gitHub.com</a></span>
                 <span>US State data provided by <a href="https://covidtracking.com/">The Covid Tracking Project</a></span>
             </p>
+        </div>
+        <div>
+            <span class="picker">Weight:</span><input type="text" value="1" id="weight" onchange="displayAll()">
         </div>
         <div>
             <span class="picker">Smoothing days:</span><input type="radio" id="days_7" value="7" onchange="daysSmoothingChanged(7)" checked>7
