@@ -26,11 +26,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
     <body onload="onLoad();">
         <div class='page-title'>
-            <P>Daily Tracking and Trends for</P>
-            <P>Severe Acute Respiratory Syndrome Coronavirus 2 (SARS-CoV-2)</P>
-            <P>Referred to as COVID-19</P>
+            Daily Tracking and Trends for<br>
+            Severe Acute Respiratory Syndrome Coronavirus 2 (SARS-CoV-2)<br>
+            Referred to as COVID-19 <span style="float: right; font-size: 10pt; color: blue;" onmouseenter="showReadMe();">Read me</span>
         </div>
-        <div>
+        <div id="read-me-div" onmouseout="hideReadMe();" onclick="hideReadMe(true);" style="display: none; z-index: 1; position: fixed; background-color: lightgray; box-shadow: 2px 4px gray;">
             <ul>
                 <li>The graphs on the left are rolling sums of past data reported by the WHO and <a href="https://covidtracking.com/">The Covid Tracking Project</a>.</li>
                 <li>They are normalized by the reporting region's <b>population in millions</b>. This provides people all over the world with a common value for 

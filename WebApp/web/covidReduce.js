@@ -10,16 +10,12 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-var winSize = 7;
-
-var selected = {
-    'PH': false,
-    'KR': false,
-    'BE': false,
-    'US': true
-    };
-
-
+var CTData = {
+    winSize: 7,
+    selected: {},
+    openPopups: [],
+    popupTimeout: null
+};
 
 async function setConutryCode() {
   await $.ajax('http://ip-api.com/json', {
@@ -27,8 +23,8 @@ async function setConutryCode() {
         dataType :'json'
     }).then(function (data){
         var cc = data.countryCode;
-          selected = {};
-          selected[cc] = true;
+          CTData.selected = {};
+          CTData.selected[cc] = true;
           readData();
     });
 }
@@ -38,7 +34,7 @@ function onLoad() {
 }
 
 function begin() {
-    winSize = 7;
+    CTData.winSize = 7;
     updateCountryRadios();
     updateUSAStateRadios();
     setSmoothingDays();
@@ -69,7 +65,7 @@ function updateCountryRadios() {
     keys.forEach(function(key){
         if (key.indexOf('US_') !== -1)
             return;
-        var checked = selected[key] ? 'checked' : '';
+        var checked = CTData.selected[key] ? 'checked' : '';
 
         var cd = dataSet[key];
         var curFirst = cd.name.toLowerCase().charCodeAt(0);
@@ -113,7 +109,7 @@ function updateUSAStateRadios() {
     keys.forEach(function(key){
         if (key.indexOf('US_') === -1)
             return;
-        var checked = selected[key] ? 'checked' : '';
+        var checked = CTData.selected[key] ? 'checked' : '';
 
         var cd = dataSet[key];
         var curFirst = cd.name.toLowerCase().charCodeAt(0);
@@ -142,39 +138,36 @@ function updateUSAStateRadios() {
     }
 }
 
-var openPopups = [];
-var popupTimeout = null;
-
 function closePopups() {
-    openPopups.forEach(function(el){
+    CTData.openPopups.forEach(function(el){
         el.style.display = 'none';
     });
-    openPopups = [];    
+    CTData.openPopups = [];    
 }
 
 function keepLastPopupOpen() {
-    if (openPopups.length > 0) {
-    if (popupTimeout)
-        clearTimeout(popupTimeout);
-        openPopups[openPopups.length - 1].style.display = 'unset';
-        popupTimeout = setTimeout(function(){
+    if (CTData.openPopups.length > 0) {
+    if (CTData.popupTimeout)
+        clearTimeout(CTData.popupTimeout);
+        CTData.openPopups[CTData.openPopups.length - 1].style.display = 'unset';
+        CTData.popupTimeout = setTimeout(function(){
             closePopups();
-            popupTimeout = null;
+            CTData.popupTimeout = null;
         }, 3000);
     }
 }
 
 function onEnterCountry(el) {
-    if (popupTimeout)
-        clearTimeout(popupTimeout);
+    if (CTData.popupTimeout)
+        clearTimeout(CTData.popupTimeout);
 
     closePopups();
     var divEl = el.nextElementSibling;
     divEl.style.display = 'unset';
-    openPopups.push(divEl);
-    popupTimeout = setTimeout(function(){
+    CTData.openPopups.push(divEl);
+    CTData.popupTimeout = setTimeout(function(){
         closePopups();
-        popupTimeout = null;
+        CTData.popupTimeout = null;
     }, 3000);
 }
 
@@ -183,13 +176,13 @@ function onLeaveCountry(el) {
 }
 
 function clearAll() {
-    var keys = Object.keys(selected);
+    var keys = Object.keys(CTData.selected);
     keys.forEach(function(key){
         var checkEl = document.getElementById(key);
         if (checkEl)
             checkEl.checked = false;
     });
-    selected = {};
+    CTData.selected = {};
     displayAll();
 }
 
@@ -199,14 +192,14 @@ function toggleSelected(codes) {
         var checkEl = document.getElementById(item);
         if (checkEl)
             checkEl.checked = false;
-        selected[item] = false;
+        CTData.selected[item] = false;
     });
     lastToggleSelected = codes;
     lastToggleSelected.forEach(function(item){
         var checkEl = document.getElementById(item);
         if (checkEl)
             checkEl.checked = true;
-        selected[item] = true;
+        CTData.selected[item] = true;
     });
 
     displayAll();
@@ -216,12 +209,12 @@ function toggleSelected(codes) {
 function onChanged(el) {
     keepLastPopupOpen();
     var item = el.id;
-    selected[item] = !selected[item];
+    CTData.selected[item] = !CTData.selected[item];
     displayAll();
 }
 
 function setSmoothingDays() {
-    switch (winSize) {
+    switch (CTData.winSize) {
         case 7: 
             document.getElementById('days_7').checked = true;
             document.getElementById('days_14').checked = false;
@@ -243,21 +236,21 @@ function setSmoothingDays() {
 }
 
 function daysSmoothingChanged(days) {
-    if (days != winSize) {
-        winSize = days;
+    if (days != CTData.winSize) {
+        CTData.winSize = days;
         setSmoothingDays();
         displayAll();
     }
 }
 
 function computeAverages(data, keys, selArr, idx, pop, result) {
-    var scale = 7 / winSize;
+    var scale = 7 / CTData.winSize;
     for (var i = 0; i < data.length; i++) {
         var sumCases = 0;
         var sumDeaths = 0;
         var sumHospitalized = 0;
-        var steps = winSize;
-        if (i < winSize)
+        var steps = CTData.winSize;
+        if (i < CTData.winSize)
             steps = i;
         for (var j = 0; j < steps; j++) {
             var dataIdx = i + j - (steps - 1);
@@ -309,8 +302,8 @@ function computeSlopes(dataArr) {
             var caseAvg = 0, deathAvg = 0, hospitalizedAvg = 0;
             var denom = 0;
             var caseNumer = 0, deathNumer = 0, hospitalizedNumer = 0;
-            var steps = winSize;
-            if (j < winSize)
+            var steps = CTData.winSize;
+            if (j < CTData.winSize)
                 steps = j;
             if (steps > 0) {
                 for (var k = 0; k < steps; k++) {
@@ -349,9 +342,9 @@ function genData(dataSet) {
     var result = {}; // TODO Change the result to an array. We need the map to order the unsynchronized dates.
 
     var selArr = [];
-    var keys = Object.keys(selected);
+    var keys = Object.keys(CTData.selected);
     keys.forEach(function(key){
-        if (selected[key])
+        if (CTData.selected[key])
             selArr.push(key);
     });
 
@@ -724,4 +717,17 @@ function genGraph(dataKind) {
 
 function displayData(dataKind) {
     genGraph(dataKind);
+}
+
+function showReadMe() {
+    var el = document.getElementById("read-me-div");
+    el.style.display = 'unset';
+}
+
+function hideReadMe(force) {
+    var evt = window.event;
+    var el = document.getElementById("read-me-div");
+    if (!force && evt.target !== el)
+        return;
+    el.style.display = 'none';
 }
