@@ -67,13 +67,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         </div>
         <div><span class="picker"></span><button type="button" class="clear-button" onclick="clearAll()">Clear All</button></div>
         <div>
-            Countries achieving success in: <a href="" onclick="return toggleSelected(['CA', 'DM', 'JM', 'CL']);">Americas</a>, <a href="" onclick="return toggleSelected(['KR', 'JP', 'SG', 'CN', 'TH']);">Asia</a>, <a href="" onclick="return toggleSelected(['BE', 'IT', 'ES', 'DE', 'CH', 'AD', 'FR']);">Europe</a>.
+            <span class="picker">View:</span>
+            <button class="tab-button" type="button" onclick="showTab('cases-tab')">Cases</button>
+            <button class="tab-button" type="button" onclick="showTab('deaths-tab')">Deaths</button>
+            <button class="tab-button" type="button" onclick="showTab('hospital-tab')">Hospitalizations</button>
         </div>
-        <div>
-            Groups: <a href="" onclick="return toggleSelected(['CA', 'US', 'DE', 'IT', 'GB', 'FR', 'JP', 'RU']);">Group of 8</a> 
-            <a href="" onclick="return toggleSelected(['US', 'GB', 'FR', 'JP', 'RU', 'CN', 'DE']);">Major Powers</a>
-        </div>
-        <div>
+        <div id="cases-tab" style="display: none;">
             <div class="graph">
                 <div class="title">COVID-19 Normalized Weekly Cases</div>
                 <div id="cases">            
@@ -85,7 +84,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 </div>
             </div>
         </div>
-        <div>
+        <div id="deaths-tab" style="display: none;">
             <div class="graph">
                 <div class="title">COVID-19 Normalized Weekly Deaths</div>
                 <div id="deaths">            
@@ -97,7 +96,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 </div>
             </div>
         </div>
-        <div>
+        <div id="hospital-tab" style="display: none;">
             <div class="graph">
                 <div class="title">COVID-19 Normalized Average Hospitalized<a href="#note_2">**</a><br>Current cost estimates are about $7,000/day per patient.<a href="#note_3">***</a></div>
                 <div id="hospitalized">            

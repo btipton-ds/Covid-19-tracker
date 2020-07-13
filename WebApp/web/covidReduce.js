@@ -38,7 +38,8 @@ function begin() {
     updateCountryRadios();
     updateUSAStateRadios();
     setSmoothingDays();
-    displayAll();    
+    displayAll();
+    showTab('cases-tab');
 }
 
 function displayAll() {
@@ -72,7 +73,7 @@ function updateCountryRadios() {
         if (firstChar === -1) {
             firstChar = curFirst;
             alphaDiv = divBegin;
-            alphaDiv += '<button class="letter-button" type="button" onclick="onEnterCountry(this)">' + String.fromCharCode(firstChar).toUpperCase()  + '</button>';
+            alphaDiv += '<button class="letter-button" onclick="onEnterCountry(this)">' + String.fromCharCode(firstChar).toUpperCase()  + '</button>';
             alphaDiv += divStyled;
         } else if (curFirst !== firstChar) {
             firstChar = curFirst;
@@ -116,7 +117,7 @@ function updateUSAStateRadios() {
         if (firstChar === -1) {
             firstChar = curFirst;
             alphaDiv = divBegin;
-            alphaDiv += '<button class="letter-button" type="button" onclick="onEnterCountry(this)">' + String.fromCharCode(firstChar).toUpperCase()  + '</button>';
+            alphaDiv += '<button class="letter-button" onclick="onEnterCountry(this)">' + String.fromCharCode(firstChar).toUpperCase()  + '</button>';
             alphaDiv += divStyled;
         } else if (curFirst !== firstChar) {
             firstChar = curFirst;
@@ -730,4 +731,17 @@ function hideReadMe(force) {
     if (!force && evt.target !== el)
         return;
     el.style.display = 'none';
+}
+
+function showTab(tabId) {
+    var tabs = [
+        'cases-tab',
+        'deaths-tab',
+        'hospital-tab'
+    ];
+    
+    tabs.forEach(function(tab){
+        var el = document.getElementById(tab);
+        el.style.display = tab === tabId ? 'unset' : 'none';
+    });
 }
