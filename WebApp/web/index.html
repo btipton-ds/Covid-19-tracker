@@ -21,14 +21,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <script src="population.js?v=1"></script>
         <script src="data.js?v=1"></script>
         <script src="covidReduce.js?v=1"></script>
-        <link rel="stylesheet" type="text/css" href="main.css">
+        <link rel="stylesheet" type="text/css" href="main.css?v=1">
     </head>
 
     <body onload="onLoad();">
-        <div class='page-title'>
+        <div class='page-title bkg-white'>
             Daily Tracking and Trends for<br>
             Severe Acute Respiratory Syndrome Coronavirus 2 (SARS-CoV-2)<br>
-            Referred to as COVID-19 <span style="float: right; font-size: 10pt; color: blue;" onmouseenter="showReadMe();">Read me</span>
+            Referred to as COVID-19
         </div>
         <div id="read-me-div" onmouseout="hideReadMe();" onclick="hideReadMe(true);" style="display: none; z-index: 1; position: fixed; background-color: lightgray; box-shadow: 2px 4px gray;">
             <ul>
@@ -54,61 +54,61 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 <span>US State data provided by <a href="https://covidtracking.com/">The Covid Tracking Project</a></span>
             </p>
         </div>
-        <div>
+        <div class="bkg-white">
             <span class="picker">Smoothing days:</span><input type="radio" id="days_7" value="7" onchange="daysSmoothingChanged(7)" checked>7
             <input type="radio" id="days_14" value="14" onchange="daysSmoothingChanged(14)">14
             <input type="radio" id="days_21" value="21" onchange="daysSmoothingChanged(21)">21
+            <span style="float: right; font-size: 10pt; color: blue;" onmouseenter="showReadMe();">Read me</span>
         </div>
-        <div id="countries">
+        <div id="countries" class="bkg-white">
             Loading WHO data. Please wait.
         </div>
-        <div id="usa_states">
+        <div id="usa_states" class="bkg-white">
             Loading USA states data. Please wait.
         </div>
-        <div><span class="picker"></span><button type="button" class="clear-button" onclick="clearAll()">Clear All</button></div>
-        <div>
-            <span class="picker">View:</span>
-            <button class="tab-button" type="button" onclick="showTab('cases-tab')">Cases</button>
+        <div class="bkg-white"><span class="picker"></span><button type="button" class="clear-button" onclick="clearAll()">Clear All</button></div>
+        <div class="bkg-white">
+            <span class="picker">View:</span><button class="tab-button" type="button" onclick="showTab('cases-tab')">Cases</button>
             <button class="tab-button" type="button" onclick="showTab('deaths-tab')">Deaths</button>
             <button class="tab-button" type="button" onclick="showTab('hospital-tab')">Hospitalizations</button>
         </div>
         <div id="cases-tab" style="display: none;">
-            <div class="graph">
+            <div class="graph bkg-white">
                 <div class="title">COVID-19 Normalized Weekly Cases</div>
                 <div id="cases">            
                 </div>
             </div>
-            <div class="graph">
+            <div class="graph bkg-white">
                 <div class="title">COVID-19 NCRS</div>
                 <div id="caseSlope">            
                 </div>
             </div>
         </div>
         <div id="deaths-tab" style="display: none;">
-            <div class="graph">
+            <div class="graph bkg-white">
                 <div class="title">COVID-19 Normalized Weekly Deaths</div>
                 <div id="deaths">            
                 </div>
             </div>
-            <div class="graph">
+            <div class="graph bkg-white">
                 <div class="title">COVID-19 NDRS</div>
                 <div id="deathSlope">            
                 </div>
             </div>
         </div>
         <div id="hospital-tab" style="display: none;">
-            <div class="graph">
+            <div class="graph bkg-white">
                 <div class="title">COVID-19 Normalized Average Hospitalized<a href="#note_2">**</a><br>Current cost estimates are about $7,000/day per patient.<a href="#note_3">***</a></div>
                 <div id="hospitalized">            
                 </div>
             </div>
-            <div class="graph">
+            <div class="graph bkg-white">
                 <div class="title">COVID-19 Normalized Average Hospitalized Slope</div>
                 <div id="hospitalizedSlope">            
                 </div>
             </div>
         </div>
-        <div class="body_text">
+        <div class="body_text bkg-white">
             <a name='Details'>
                 <P class='title'>Details</P>
                 <P>This is fundamental, high school math, historical rate and trend tracking. There are NO PREDICTIONS of future results. 
@@ -134,7 +134,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 <P>Bob Tipton - <a href='http://darkskyinnovation.com/'>Founder Dark Sky Innovative Solutions</a></P>
             </a>
         </div>
-        <div class="notes">
+        <div class="notes bkg-white">
             <P>
                 <a name='note_1'>* Based on my observations and a SWAG (Scientific Wild Assed Guess). Thailand, The Republic of Korea and Japan are 
                 currently in the best maintenance situation. They are all maintaining Normalized New Case Rate (NNCR) values below 10 new 

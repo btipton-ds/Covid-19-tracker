@@ -1,5 +1,14 @@
+
+body {
+ background-image: url("back_ground.jpg");
+ 
+}
 .body_text, .notes{
     width: 800px;
+}
+
+.bkg-white {
+    background-color: white;    
 }
 
 .notes{
@@ -12,6 +21,7 @@
     font-size: 14pt;
     text-align: center;
     font-weight: bold;
+    width: auto;
 }
 
 .page-title {
@@ -23,6 +33,7 @@
 }
 
 .graph {
+    display: inline-block;
     border-style: solid;
     border-width: 1pt;
     padding: 2pt;
