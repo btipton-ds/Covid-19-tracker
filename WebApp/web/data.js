@@ -45,10 +45,38 @@ async function readUSAData() {
         mimeType : '"text/json"',
         dataType :'json'
     }).then(function (data){
-        processUSAData(data);
+        var allData = processUSAData(data);
+        fixObviousErrors(allData);
         begin();
     });
     
+}
+
+function fixObviousErrors(allData) {
+    var keys = Object.keys(allData);
+    keys.forEach(function(key){
+        var e = allData[key];
+        var data = e.data;
+        for (var i = 0; i < data.length; i++) {
+            if (i === data.length - 1) {
+
+            } else {
+                if (data[i].dailyCases < 0) {
+                    data[i].dailyCases = (data[i-1].dailyCases + data[i+1].dailyCases) / 2;
+                    if (data[i].dailyCases < 0) {
+                        data[i].dailyCases = Math.max(data[i-1].dailyCases, data[i+1].dailyCases);
+                    }
+                }
+                if (data[i].dailyDeaths < 0) {
+                    data[i].dailyDeaths = (data[i-1].dailyDeaths + data[i+1].dailyDeaths) / 2;
+                    if (data[i].dailyDeaths < 0) {
+                        data[i].dailyDeaths = Math.max(data[i-1].dailyDeaths, data[i+1].dailyDeaths);
+                    }
+                }
+            }
+        }
+    });
+
 }
 
 function getData() {
@@ -115,6 +143,7 @@ function processWHOData(data) {
 
         gWorldDataMap[countryCode].data.push(entry);
     });
+    
     return gWorldDataMap;
 }
 
