@@ -65,6 +65,15 @@ body {
     font-weight: bold;
 }
 
+.leader-title {
+    text-align: center;
+    font-size: 12pt;
+    font-weight: bold;
+    width: 100%;
+    display: inline-block;
+    background-color: lightsteelblue;    
+}
+
 .leaderList {
     display: inline-block;
     width: 390pt;
