@@ -21,7 +21,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <script src="population.js?v=5"></script>
         <script src="data.js?v=5"></script>
         <script src="covidReduce.js?v=5"></script>
-        <link rel="stylesheet" type="text/css" href="main.css?v=5">
+        <link rel="stylesheet" type="text/css" href="main.css?v=6">
     </head>
 
     <body onload="onLoad();">
@@ -68,26 +68,43 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         </div>
         <div class="bkg-white"><span class="picker"></span><button type="button" class="clear-button" onclick="clearAll()">Clear All</button></div>
         <div class="bkg-white">
-            <span class="picker">View:</span><button class="tab-button" type="button" onclick="showTab('leaders-tab')">Leading Reports</button>
-            <button class="tab-button" type="button" onclick="showTab('cases-tab')">Cases</button>
+            <span class="picker">View:</span><button class="tab-button" type="button" onclick="showTab('cases-tab')">Cases</button>
             <button class="tab-button" type="button" onclick="showTab('deaths-tab')">Deaths</button>
             <button class="tab-button" type="button" onclick="showTab('hospital-tab')">Hospitalizations</button>
+            <button class="tab-button" type="button" onclick="showTab('leaders-world-tab')">World Min/Max</button>
+            <button class="tab-button" type="button" onclick="showTab('leaders-usa-tab')">USA Min/Max</button>
         </div>
-        <div id="leaders-tab" style="display: none;">
-            <div class="title bkg-white">World New Cases / million</div>
-            <div id="world_leaders_cases" class="bkg-white">
+        <div id="leaders-world-tab" style="display: none;">
+            <div class="title bkg-white">New Cases per Week / million</div>
+            <div id="leading_world_cases" class="bkg-white">
+                <div id="leading_world_max_cases" class="leaderList">
+                </div>
+                <div id="leading_world_min_cases" class="leaderList">
+                </div>
+            </div>
+            <div class="title bkg-white">New Case Rate of Change</div>
+            <div id="leading_world_ncrs" class="bkg-white">
+                <div id="leading_world_max_ncrs" class="leaderList">
+                </div>
+                <div id="leading_world_min_ncrs" class="leaderList">
+                </div>
+            </div>
+        </div>
+        <div id="leaders-usa-tab" style="display: none;">
+            <div class="title bkg-white">New Cases per Week / million</div>
+            <div id="leading_usa_cases" class="bkg-white">
+                <div id="leading_usa_max_cases" class="leaderList">
+                </div>
+                <div id="leading_usa_min_cases" class="leaderList">
+                </div>
             </div>
 
-            <div class="title bkg-white">USA New Cases / million</div>
-            <div id="usa_leaders_cases" class="bkg-white">
-            </div>
-
-            <div class="title bkg-white">World NCRS</div>
-            <div id="world_leaders_ncrs" class="bkg-white">
-            </div>
-
-            <div class="title bkg-white">USA NCRS</div>
-            <div id="usa_leaders_ncrs" class="bkg-white">
+            <div class="title bkg-white">New Case Rate of Change</div>
+            <div id="leading_usa_ncrs" class="bkg-white">
+                <div id="leading_usa_max_ncrs" class="leaderList">
+                </div>
+                <div id="leading_usa_min_ncrs" class="leaderList">
+                </div>
             </div>
         </div>
         <div id="cases-tab" style="display: none;">

@@ -12,6 +12,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 var CTData = {
     winSize: 7,
+    listSize: 20,
     selected: {},
     openPopups: [],
     popupTimeout: null,
@@ -665,44 +666,56 @@ function computeLatest() {
     makeSorted();
 }
 
-function addSorted(elId, list, key) {
+function leaderString(count, name, val, colorize) {
+    if (colorize) {
+        if (val < 0)
+            return '<span class="leader_count">' + count + '</span><span class="leader_name">' + name + '</span><span class="leader_value leader_grn">' + val.toFixed(3) + '</span><br>';
+        else 
+            return '<span class="leader_count">' + count + '</span><span class="leader_name">' + name + '</span><span class="leader_value leader_red">' + val.toFixed(3) + '</span><br>';
+    } else
+        return '<span class="leader_count">' + count + '</span><span class="leader_name">' + name + '</span><span class="leader_value">' + val.toFixed(3) + '</span><br>';
+}
+
+function addSorted(elId, list, key, colorize) {
     var whoData = getData();
     var i, count, ce, cd;
-    var filter = elId.indexOf('usa_') === 0;
+    var isUsa = elId.indexOf('_usa_') !== -1;
 
+    var numToDisplay = isUsa ? 26 : CTData.listSize;
     var el = document.getElementById(elId);
-    count = 0;
+    count = 1;
     for (i = 0; i < list.length; i++) {
         ce = list[i];
         var val = ce[key];
-        if (!filter || (ce.countryCode.indexOf('US_') === 0)) {
+        if ((isUsa && (ce.countryCode.indexOf('US_') === 0)) || (!isUsa && (ce.countryCode.indexOf('US_') !== 0))) {
             if (val !== 0) {
                 cd = whoData[ce.countryCode];
-                el.innerHTML += cd.name + ': ' + val.toFixed(3) + '<br>';
+                el.innerHTML += leaderString(count, cd.name, val, colorize);
                 count++;
-                if (count >= 10)
+                if (count > numToDisplay)
                     break;
             }
         }
     }
 }
 
-function addSortedRev(elId, list, key) {
+function addSortedRev(elId, list, key, colorize) {
     var whoData = getData();
     var i, count, ce, cd;
-    var filter = elId.indexOf('usa_') === 0;
+    var isUsa = elId.indexOf('_usa_') !== -1;
+    var numToDisplay = isUsa ? 26 : CTData.listSize;
 
     var el = document.getElementById(elId);
-    count = 0;
+    count = 1;
     for (i = list.length - 1; i >= 0; i--) {
         ce = list[i];
         var val = ce[key];
-        if (!filter || (ce.countryCode.indexOf('US_') === 0)) {
+        if ((isUsa && (ce.countryCode.indexOf('US_') === 0)) || (!isUsa && (ce.countryCode.indexOf('US_') !== 0))) {
             if (val !== 0) {
                 cd = whoData[ce.countryCode];
-                el.innerHTML += cd.name + ': ' + val.toFixed(3) + '<br>';
+                el.innerHTML += leaderString(count, cd.name, val, colorize);
                 count++;
-                if (count >= 10)
+                if (count > numToDisplay)
                     break;
             }
         }
@@ -722,10 +735,10 @@ function makeSorted() {
     CTData.lastEntry.forEach(function(entry){
         arr.push(entry);
     });
-    addSorted('world_leaders_ncrs', arr, 'caseSlope');
-    addSortedRev('world_leaders_ncrs', arr, 'caseSlope');
-    addSorted('usa_leaders_ncrs', arr, 'caseSlope');
-    addSortedRev('usa_leaders_ncrs', arr, 'caseSlope');
+    addSorted('leading_world_max_ncrs', arr, 'caseSlope', true);
+    addSortedRev('leading_world_min_ncrs', arr, 'caseSlope', true);
+    addSorted('leading_usa_max_ncrs', arr, 'caseSlope', true);
+    addSortedRev('leading_usa_min_ncrs', arr, 'caseSlope', true);
 
     CTData.lastEntry.sort(function(a,b){
         if (a.cases > b.cases)
@@ -738,10 +751,10 @@ function makeSorted() {
     CTData.lastEntry.forEach(function(entry){
         arr.push(entry);
     });
-    addSorted('world_leaders_cases', arr, 'cases');
-    addSortedRev('world_leaders_cases', arr, 'cases');
-    addSorted('usa_leaders_cases', arr, 'cases');
-    addSortedRev('usa_leaders_cases', arr, 'cases');
+    addSorted('leading_world_max_cases', arr, 'cases', false);
+    addSortedRev('leading_world_min_cases', arr, 'cases', false);
+    addSorted('leading_usa_max_cases', arr, 'cases', false);
+    addSortedRev('leading_usa_min_cases', arr, 'cases', false);
 
 
 }
@@ -870,11 +883,12 @@ function showTab(tabId) {
         'cases-tab',
         'deaths-tab',
         'hospital-tab',
-        'leaders-tab'
+        'leaders-world-tab',
+        'leaders-usa-tab'
     ];
     
     tabs.forEach(function(tab){
         var el = document.getElementById(tab);
-        el.style.display = tab === tabId ? 'unset' : 'none';
+        el.style.display = tab === tabId ? 'inline-block' : 'none';
     });
 }

@@ -64,3 +64,39 @@ body {
     display: inline-block;
     font-weight: bold;
 }
+
+.leaderList {
+    display: inline-block;
+    width: 390pt;
+    padding: 5pt;  
+}
+
+.leader_red {
+    color: red;
+}
+
+.leader_grn {
+    color: green;
+}
+
+.leader_count, .leader_name, .leader_value {
+    display: inline-block;
+    margin-right: 3pt;
+}
+
+.leader_count, .leader_value {
+    text-align: right;
+}
+
+.leader_count {
+    width: 20pt;
+}
+
+.leader_value {
+    width: 80pt;
+}
+
+.leader_name {
+    width: 265pt;
+}
+
