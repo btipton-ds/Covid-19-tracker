@@ -14,7 +14,8 @@ var CTData = {
     winSize: 7,
     selected: {},
     openPopups: [],
-    popupTimeout: null
+    popupTimeout: null,
+    lastEntry: []
 };
 
 async function setConutryCode() {
@@ -40,6 +41,7 @@ function begin() {
     setSmoothingDays();
     displayAll();
     showTab('cases-tab');
+    computeLatest();
 }
 
 function displayAll() {
@@ -339,13 +341,13 @@ function computeSlopes(dataArr) {
     }
 }
 
-function genData(dataSet) {
+function genData(dataSet, selected) {
     var result = {}; // TODO Change the result to an array. We need the map to order the unsynchronized dates.
 
     var selArr = [];
-    var keys = Object.keys(CTData.selected);
+    var keys = Object.keys(selected);
     keys.forEach(function(key){
-        if (CTData.selected[key])
+        if (selected[key])
             selArr.push(key);
     });
 
@@ -614,9 +616,139 @@ function drawXGrid(env, dataArr) {
     }    
 }
 
+function computeLatest() {
+    var whoData = getData();
+    var selected = [];
+    var allKeys = Object.keys(whoData);
+    allKeys.forEach(function(key){
+        if (whoData.hasOwnProperty(key)) {
+            selected[key] = true;
+        }
+    });
+
+    var dataSet = genData(whoData, selected);
+    var dataArr = [];
+    var dataKeys = Object.keys(dataSet);
+    dataKeys.sort(function(a, b){
+        return Number(a) - Number(b);
+    });
+    dataKeys.forEach(function(key){
+        dataArr.push(dataSet[key]);
+    });
+
+    computeSlopes(dataArr);
+    
+    var countryMap = {};
+    var numFound = 0;
+    // Loop over dates
+    for (var idx = dataArr.length - 1; idx >= 0; idx--) {
+        var entries = dataArr[idx];
+        if (!entries)
+            continue;
+        
+        for (var cntIdx = 0; cntIdx < entries.length; cntIdx++) {
+            var ce = entries[cntIdx];
+            if (ce.valid && !countryMap.hasOwnProperty(ce.countryCode)) { 
+                countryMap[ce.countryCode] = ce;
+                numFound++;
+            }
+        }
+        if (numFound > entries.length - 50)
+            break;
+    }
+    
+    var countryKeys = Object.keys(countryMap);
+    countryKeys.forEach(function(key){
+        CTData.lastEntry.push(countryMap[key]);
+    });
+    
+    makeSorted();
+}
+
+function addSorted(elId, list, key) {
+    var whoData = getData();
+    var i, count, ce, cd;
+    var filter = elId.indexOf('usa_') === 0;
+
+    var el = document.getElementById(elId);
+    count = 0;
+    for (i = 0; i < list.length; i++) {
+        ce = list[i];
+        var val = ce[key];
+        if (!filter || (ce.countryCode.indexOf('US_') === 0)) {
+            if (val !== 0) {
+                cd = whoData[ce.countryCode];
+                el.innerHTML += cd.name + ': ' + val.toFixed(3) + '<br>';
+                count++;
+                if (count >= 10)
+                    break;
+            }
+        }
+    }
+}
+
+function addSortedRev(elId, list, key) {
+    var whoData = getData();
+    var i, count, ce, cd;
+    var filter = elId.indexOf('usa_') === 0;
+
+    var el = document.getElementById(elId);
+    count = 0;
+    for (i = list.length - 1; i >= 0; i--) {
+        ce = list[i];
+        var val = ce[key];
+        if (!filter || (ce.countryCode.indexOf('US_') === 0)) {
+            if (val !== 0) {
+                cd = whoData[ce.countryCode];
+                el.innerHTML += cd.name + ': ' + val.toFixed(3) + '<br>';
+                count++;
+                if (count >= 10)
+                    break;
+            }
+        }
+    }
+}
+
+function makeSorted() {
+    var arr;
+    CTData.lastEntry.sort(function(a,b){
+        if (a.caseSlope > b.caseSlope)
+            return -1;
+        else if (a.caseSlope < b.caseSlope)
+            return 1;
+        return 0;
+    });
+    arr = [];
+    CTData.lastEntry.forEach(function(entry){
+        arr.push(entry);
+    });
+    addSorted('world_leaders_ncrs', arr, 'caseSlope');
+    addSortedRev('world_leaders_ncrs', arr, 'caseSlope');
+    addSorted('usa_leaders_ncrs', arr, 'caseSlope');
+    addSortedRev('usa_leaders_ncrs', arr, 'caseSlope');
+
+    CTData.lastEntry.sort(function(a,b){
+        if (a.cases > b.cases)
+            return -1;
+        else if (a.cases < b.cases)
+            return 1;
+        return 0;
+    });
+    arr = [];
+    CTData.lastEntry.forEach(function(entry){
+        arr.push(entry);
+    });
+    addSorted('world_leaders_cases', arr, 'cases');
+    addSortedRev('world_leaders_cases', arr, 'cases');
+    addSorted('usa_leaders_cases', arr, 'cases');
+    addSortedRev('usa_leaders_cases', arr, 'cases');
+
+
+}
+
 function genGraph(dataKind) {
     var whoData = getData();
-    var dataSet = genData(whoData);
+    var dataSet = genData(whoData, CTData.selected);
     var dataArr = [];
     var dataKeys = Object.keys(dataSet);
     dataKeys.sort(function(a,b){
@@ -737,7 +869,8 @@ function showTab(tabId) {
     var tabs = [
         'cases-tab',
         'deaths-tab',
-        'hospital-tab'
+        'hospital-tab',
+        'leaders-tab'
     ];
     
     tabs.forEach(function(tab){
