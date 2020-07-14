@@ -25,9 +25,12 @@ async function setConutryCode() {
         dataType :'json'
     }).then(function (data){
         var cc = data.countryCode;
-          CTData.selected = {};
-          CTData.selected[cc] = true;
-          readData();
+
+        if (cc === 'PH')
+            document.body.style['background-image'] = 'url("back_ground_ph.jpg")';
+        CTData.selected = {};
+        CTData.selected[cc] = true;
+        readData();
     });
 }
 
