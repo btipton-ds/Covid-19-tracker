@@ -52,6 +52,18 @@ async function readUSAData() {
     
 }
 
+function isBadCaseDate(countryCode, dataRec) {
+    for(var i = 0; i < CTData.badCaseEntries.length; i++) {
+        var entry = CTData.badCaseEntries[i];
+        if (countryCode !== entry.cc)
+            continue;
+        var entDate = entry.date;
+        if (entDate.getFullYear() == dataRec.date.getFullYear() && entDate.getMonth() === dataRec.date.getMonth() && entDate.getDate() === dataRec.date.getDate())
+            return true;
+    }
+    return false;
+}
+
 function fixObviousErrors(allData) {
     var keys = Object.keys(allData);
     keys.forEach(function(key){
@@ -61,48 +73,54 @@ function fixObviousErrors(allData) {
             if (i === data.length - 1) {
             } else if (i === 0) {
             } else {
-                if (data[i].dailyCases < 0) {
-                    data[i].dailyCases = (data[i-1].dailyCases + data[i+1].dailyCases) / 2;
+                if (isBadCaseDate(key, data[i])) {
+                    console.log('Patching ' + key + ': ' + data[i].date);
+                    data[i].dailyCases = Math.max(data[i-1].dailyCases, data[i+1].dailyCases);
+                } else {
                     if (data[i].dailyCases < 0) {
-                        data[i].dailyCases = Math.max(data[i-1].dailyCases, data[i+1].dailyCases);
-                    }
-                }
-                if (data[i].dailyDeaths < 0) {
-                    data[i].dailyDeaths = (data[i-1].dailyDeaths + data[i+1].dailyDeaths) / 2;
-                    if (data[i].dailyDeaths < 0) {
-                        data[i].dailyDeaths = Math.max(data[i-1].dailyDeaths, data[i+1].dailyDeaths);
-                    }
-                }
-
-                var avg = 0, count = 0;
-                for (var j = -3; j <= 3; j++) {
-                    var idx = i + j;
-                    if (idx >= 0 && idx < data.length) {
-                        avg += data[idx].dailyCases;
-                        count++;
-                    }
-                }
-                if (count > 1) {
-                    avg /= count;
-                    var avgSqr = 0
-                    var span = 4;
-                    for (var j = -span; j <= span; j++) {
-                        var idx = i + j;
-                        if (idx >= 0 && idx < data.length) {
-                            var diff = data[idx].dailyCases - avg;
-                            avgSqr += diff * diff;
+                        data[i].dailyCases = (data[i-1].dailyCases + data[i+1].dailyCases) / 2;
+                        if (data[i].dailyCases < 0) {
+                            data[i].dailyCases = Math.max(data[i-1].dailyCases, data[i+1].dailyCases);
                         }
                     }
-                    avgSqr /= (count - 1);
-                    var sigma = Math.sqrt(avgSqr);
-                    var delta = Math.abs(data[i].dailyCases - avg);
-
-                    if (data[i].dailyCases === 972) {
-                        console.log('hit');
+                    if (data[i].dailyDeaths < 0) {
+                        data[i].dailyDeaths = (data[i-1].dailyDeaths + data[i+1].dailyDeaths) / 2;
+                        if (data[i].dailyDeaths < 0) {
+                            data[i].dailyDeaths = Math.max(data[i-1].dailyDeaths, data[i+1].dailyDeaths);
+                        }
                     }
 
-                    if (delta > 2 * sigma) {
-                        data[i].dailyCases = Math.max(data[i-1].dailyCases, data[i+1].dailyCases);
+                    var avg = 0, count = 0;
+                    for (var j = -3; j <= 3; j++) {
+                        var idx = i + j;
+                        if (idx >= 0 && idx < data.length) {
+                            avg += data[idx].dailyCases;
+                            count++;
+                        }
+                    }
+
+                    if (count > 1) {
+                        avg /= count;
+                        var avgSqr = 0
+                        var span = 4;
+                        for (var j = -span; j <= span; j++) {
+                            var idx = i + j;
+                            if (idx >= 0 && idx < data.length) {
+                                var diff = data[idx].dailyCases - avg;
+                                avgSqr += diff * diff;
+                            }
+                        }
+                        avgSqr /= (count - 1);
+                        var sigma = Math.sqrt(avgSqr);
+                        var delta = Math.abs(data[i].dailyCases - avg);
+
+                        if (data[i].dailyCases === 972) {
+                            console.log('hit');
+                        }
+
+                        if (delta > 2 * sigma) {
+                            data[i].dailyCases = Math.max(data[i-1].dailyCases, data[i+1].dailyCases);
+                        }
                     }
                 }
             }
@@ -211,10 +229,11 @@ function processUSAData(data) {
         };
 
         gWorldDataMap[countryCode].data.push(entry);
-
-        if (stateData.state === 'SC') {
+/* Data screeing test DO NOT delete
+        if (stateData.state === 'TN') {
             console.log(entry.date + ' ' + stateData.state + ': ' + stateData.positiveIncrease);
-        }
+        }         
+ */
     });
     
     var keys = Object.keys(gWorldDataMap);

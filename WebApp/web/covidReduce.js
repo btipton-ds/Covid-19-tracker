@@ -10,13 +10,23 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+class BadDate {
+  constructor(cc, year, month, day) {  // Constructor
+    this.cc = cc;
+    this.date = new Date(year, month - 1, day);
+  }    
+}
+
 var CTData = {
     winSize: 7,
     listSize: 20,
     selected: {},
     openPopups: [],
     popupTimeout: null,
-    lastEntry: []
+    lastEntry: [],
+    badCaseEntries:[ // WARNING. Be very careful with this. If you're confident that an entry is bad, this will replace it with the interpolated value of the neighbors.
+        new BadDate('US_SC', 2020, 7, 7),
+    ]
 };
 
 async function setConutryCode() {
