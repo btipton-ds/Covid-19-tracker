@@ -679,17 +679,22 @@ function computeLatest() {
     makeSorted();
 }
 
-function leaderString(count, name, val, colorize) {
-    if (colorize) {
-        if (val < 0)
-            return '<span class="leader_count">' + count + '</span><span class="leader_name">' + name + '</span><span class="leader_value leader_grn">' + val.toFixed(3) + '</span><br>';
-        else 
-            return '<span class="leader_count">' + count + '</span><span class="leader_name">' + name + '</span><span class="leader_value leader_red">' + val.toFixed(3) + '</span><br>';
-    } else
-        return '<span class="leader_count">' + count + '</span><span class="leader_name">' + name + '</span><span class="leader_value">' + val.toFixed(3) + '</span><br>';
+function leaderString(count, name, cases, caseSlope, colorize) {
+    if (caseSlope < 0)
+        return '<span class="leader_count">' + count + '</span>' + 
+            '<span class="leader_name">' + name + '</span>' + 
+            '<span class="leader_value">' + cases.toFixed(1) + '</span>' + 
+            '<span class="leader_value leader_grn">' + caseSlope.toFixed(1) + '</span>' + 
+            '<br>';
+    else 
+        return '<span class="leader_count">' + count + '</span>' + 
+            '<span class="leader_name">' + name + '</span>' + 
+            '<span class="leader_value">' + cases.toFixed(1) + '</span>' + 
+            '<span class="leader_value leader_red">' + caseSlope.toFixed(1) + '</span>' + 
+            '<br>';
 }
 
-function addSorted(elId, list, key, colorize) {
+function addSorted(elId, list, key) {
     var whoData = getData();
     var i, count, ce, cd;
     var isUsa = elId.indexOf('_usa_') !== -1;
@@ -704,7 +709,7 @@ function addSorted(elId, list, key, colorize) {
         if ((isUsa && (ce.countryCode.indexOf('US_') === 0)) || (!isUsa && (ce.countryCode.indexOf('US_') !== 0))) {
             if (val !== 0) {
                 cd = whoData[ce.countryCode];
-                el.innerHTML += leaderString(count, cd.name, val, colorize);
+                el.innerHTML += leaderString(count, cd.name, ce.cases, ce.caseSlope);
                 count++;
                 if (count > numToDisplay)
                     break;
@@ -713,7 +718,7 @@ function addSorted(elId, list, key, colorize) {
     }
 }
 
-function addSortedRev(elId, list, key, colorize) {
+function addSortedRev(elId, list, key) {
     var whoData = getData();
     var i, count, ce, cd;
     var isUsa = elId.indexOf('_usa_') !== -1;
@@ -728,7 +733,7 @@ function addSortedRev(elId, list, key, colorize) {
         if ((isUsa && (ce.countryCode.indexOf('US_') === 0)) || (!isUsa && (ce.countryCode.indexOf('US_') !== 0))) {
             if (val !== 0) {
                 cd = whoData[ce.countryCode];
-                el.innerHTML += leaderString(count, cd.name, val, colorize);
+                el.innerHTML += leaderString(count, cd.name, ce.cases, ce.caseSlope);
                 count++;
                 if (count > numToDisplay)
                     break;
@@ -750,10 +755,10 @@ function makeSorted() {
     CTData.lastEntry.forEach(function(entry){
         arr.push(entry);
     });
-    addSorted('leading_world_max_ncrs', arr, 'caseSlope', true);
-    addSortedRev('leading_world_min_ncrs', arr, 'caseSlope', true);
-    addSorted('leading_usa_max_ncrs', arr, 'caseSlope', true);
-    addSortedRev('leading_usa_min_ncrs', arr, 'caseSlope', true);
+    addSorted('leading_world_max_ncrs', arr, 'caseSlope');
+    addSortedRev('leading_world_min_ncrs', arr, 'caseSlope');
+    addSorted('leading_usa_max_ncrs', arr, 'caseSlope');
+    addSortedRev('leading_usa_min_ncrs', arr, 'caseSlope');
 
     CTData.lastEntry.sort(function(a,b){
         if (a.cases > b.cases)
@@ -766,10 +771,10 @@ function makeSorted() {
     CTData.lastEntry.forEach(function(entry){
         arr.push(entry);
     });
-    addSorted('leading_world_max_cases', arr, 'cases', false);
-    addSortedRev('leading_world_min_cases', arr, 'cases', false);
-    addSorted('leading_usa_max_cases', arr, 'cases', false);
-    addSortedRev('leading_usa_min_cases', arr, 'cases', false);
+    addSorted('leading_world_max_cases', arr, 'cases');
+    addSortedRev('leading_world_min_cases', arr, 'cases');
+    addSorted('leading_usa_max_cases', arr, 'cases');
+    addSortedRev('leading_usa_min_cases', arr, 'cases');
 
 
 }
