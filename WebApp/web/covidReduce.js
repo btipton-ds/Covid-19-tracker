@@ -65,12 +65,12 @@ function begin() {
     updateCountryRadios();
     updateUSAStateRadios();
     setSmoothingDays();
+    computeLatest();
     displayAll();
     if (CTData.countryCode === 'US')
         showTab('hospital-tab');
     else
         showTab('cases-tab');
-    computeLatest();
 }
 
 function displayAll() {
