@@ -26,7 +26,10 @@ var CTData = {
     lastEntry: [],
     badCaseEntries:[ // WARNING. Be very careful with this. If you're confident that an entry is bad, this will replace it with the interpolated value of the neighbors.
         new BadDate('US_SC', 2020, 7, 7),
-    ]
+    ],
+    hospTerminated: new Date(2020, 7 - 1, 14),
+    hospitalCostFactor: (7000 / 1.0e6),
+    totalHospitalDays: 0
 };
 
 async function setConutryCode() {
@@ -263,6 +266,7 @@ function daysSmoothingChanged(days) {
 function computeAverages(data, keys, selArr, idx, pop, result) {
     var scale = 7 / CTData.winSize;
     for (var i = 0; i < data.length; i++) {
+        CTData.totalHospitalDays += data[i].dailyHospitalized;
         var sumCases = 0;
         var sumDeaths = 0;
         var sumHospitalized = 0;
@@ -274,7 +278,7 @@ function computeAverages(data, keys, selArr, idx, pop, result) {
             var d = data[dataIdx];
             sumCases += d.dailyCases / pop;
             sumDeaths += d.dailyDeaths / pop;
-            sumHospitalized += d.dailyHospitalized / pop;
+            sumHospitalized += d.dailyHospitalized;
         }
 
         var t = data[i].date.getTime();
@@ -303,7 +307,6 @@ function computeAverages(data, keys, selArr, idx, pop, result) {
             entry.hospitalized = 0;
             
     }
-    
 }
 
 function computeSlopes(dataArr) {
@@ -378,6 +381,13 @@ function genData(dataSet, selected) {
 
         idx++;
     });
+
+    if (CTData.totalHospitalDays > 0) {
+        var el = document.getElementById('USA_COST');
+        if (el.innerHTML === '') {
+            el.innerHTML = '$' + (CTData.totalHospitalDays * CTData.hospitalCostFactor / 1000).toFixed(2) + ' Billion';
+        }
+    }
 
     return result;
 }
@@ -455,6 +465,11 @@ function getMinMax(data) {
         });
     });
     
+    result.hospitalized.min *= CTData.hospitalCostFactor;
+    result.hospitalized.max *= CTData.hospitalCostFactor;
+    result.hospitalizedSlope.min *= CTData.hospitalCostFactor;
+    result.hospitalizedSlope.max *= CTData.hospitalCostFactor;
+
     return result;
 }
 
@@ -537,15 +552,19 @@ function calRoundedHeight(minMax) {
     return result;
 }
 
-function drawYGridLine(env, y, label) {
-        env.draw.polyline([[env.xOrigin,y], [env.xOrigin + env.graphWidth, y]]).fill('none').attr(
+function drawYGridLine(env, y, label, dataKind) {
+    env.draw.polyline([[env.xOrigin,y], [env.xOrigin + env.graphWidth, y]]).fill('none').attr(
         {
             'stroke-width':'1', 
             'stroke': 'rgb(128,128,128)' 
         });
 
         var text = env.draw.text(function(add) {
-          add.tspan(label + '/m').dy(y);
+          if (dataKind.indexOf('hospital') !== -1) {
+            add.tspan('$' + label + 'm/d').dy(y);
+          } else {
+            add.tspan(label + '/m').dy(y);
+          }
         }).font({
         family:   'TimesNewRoman',
         size:     '11pt'
@@ -585,13 +604,13 @@ function drawYGrid(env, dataKind) {
             yTick = 0;
             drewZero = true;
         }
-        drawYGridLine(env, y, yTick.toFixed(digits));
+        drawYGridLine(env, y, yTick.toFixed(digits), dataKind);
         yTick += yTS;
     }
     if (!drewZero) {
         yTick = 0;
         y = env.graphMin - env.graphHeight * ((yTick - yMinMAx.min) / yRange);
-        drawYGridLine(env, y, yTick.toFixed(digits));
+        drawYGridLine(env, y, yTick.toFixed(digits), dataKind);
     }
     return yMinMAx;
 }
@@ -779,6 +798,23 @@ function makeSorted() {
 
 }
 
+function DataAfter(sampleDate, testDate) {
+    if (!testDate)
+        return false;
+
+    if (sampleDate.getYear() < testDate.getYear())
+        return false;
+    else if (sampleDate.getYear() > testDate.getYear())
+        return true;
+    if (sampleDate.getMonth() < testDate.getMonth())
+        return false;
+    else if (sampleDate.getMonth() > testDate.getMonth())
+        return true;
+    if (sampleDate.getDate() < testDate.getDate())
+        return false;
+    return true;
+}
+
 function genGraph(dataKind) {
     var whoData = getData();
     var dataSet = genData(whoData, CTData.selected);
@@ -845,6 +881,12 @@ function genGraph(dataKind) {
             var val = 0;
             if (cd.hasOwnProperty(dataKind))
                 val = cd[dataKind];
+            var testDate = CTData.hospTerminated;
+            if (dataKind.indexOf('hospital') !== -1) {
+                if (val <= 0.0001 && cd.date && testDate && DataAfter(cd.date, testDate)) 
+                    return;
+                val *= CTData.hospitalCostFactor;
+            }
             scaledY = (val - yMin) / yHeight ;
             var pt = [env.xOrigin + env.graphWidth * (idx / w), env.graphMin - env.graphHeight * scaledY];
             points.push(pt);

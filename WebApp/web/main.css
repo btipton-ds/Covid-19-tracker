@@ -56,7 +56,7 @@ body {
 }
 
 .tab-button {
-    width: 120px;
+    width: 130px;
 }
 
 .picker {
@@ -109,3 +109,8 @@ body {
     width: 265pt;
 }
 
+.usa-cost {
+    color: red;
+    font-weight: bold;
+    font-size: 24pt;
+}

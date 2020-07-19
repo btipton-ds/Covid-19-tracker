@@ -21,14 +21,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <script src="population.js?v=7"></script>
         <script src="data.js?v=7"></script>
         <script src="covidReduce.js?v=7"></script>
-        <link rel="stylesheet" type="text/css" href="main.css?v=7">
+        <link rel="stylesheet" type="text/css" href="main.css?v=8">
     </head>
 
     <body onload="onLoad();">
         <div class='page-title bkg-white'>
             Daily Tracking and Trends for<br>
             Severe Acute Respiratory Syndrome Coronavirus 2 (SARS-CoV-2)<br>
-            Referred to as COVID-19
+            Referred to as COVID-19<br>
+            USA COVID-19 Hospital Costs: <span id="USA_COST" class="usa-cost"></span> as of last complete report.
         </div>
         <div id="read-me-div" onmouseout="hideReadMe();" onclick="hideReadMe(true);" style="display: none; z-index: 1; position: fixed; background-color: lightgray; box-shadow: 2px 4px gray;">
             <ul>
@@ -70,7 +71,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <div class="bkg-white">
             <span class="picker">View:</span><button class="tab-button" type="button" onclick="showTab('cases-tab')">Cases</button>
             <button class="tab-button" type="button" onclick="showTab('deaths-tab')">Deaths</button>
-            <button class="tab-button" type="button" onclick="showTab('hospital-tab')">Hospitalizations</button>
+            <button class="tab-button" type="button" onclick="showTab('hospital-tab')" >US Hospital $/day</button>
             <button class="tab-button" type="button" onclick="showTab('leaders-world-tab')">World Min/Max</button>
             <button class="tab-button" type="button" onclick="showTab('leaders-usa-tab')">USA Min/Max</button>
         </div>
@@ -133,12 +134,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         </div>
         <div id="hospital-tab" style="display: none;">
             <div class="graph bkg-white">
-                <div class="title">COVID-19 Normalized Average Hospitalized<a href="#note_2">**</a><br>Current cost estimates are about $7,000/day per patient.<a href="#note_3">***</a></div>
+                <div class="title">COVID-19 Daily Cost of Treatment<a href="#note_2">**</a><br>Current cost estimates are about $7,000/day per patient.<a href="#note_3">***</a></div>
                 <div id="hospitalized">            
                 </div>
             </div>
             <div class="graph bkg-white">
-                <div class="title">COVID-19 Normalized Average Hospitalized Slope</div>
+                <div class="title">COVID-19 Daily Cost of Treatment Slope</div>
                 <div id="hospitalizedSlope">            
                 </div>
             </div>
