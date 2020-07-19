@@ -38,11 +38,20 @@ async function setConutryCode() {
         dataType :'json'
     }).then(function (data){
         var cc = data.countryCode;
+        CTData.countryCode = cc;
 
         if (cc === 'PH')
             document.body.style['background-image'] = 'url("back_ground_ph.jpg")';
         CTData.selected = {};
         CTData.selected[cc] = true;
+        if (cc === 'US') {
+            CTData.selected = {
+                'US_TX' : true,
+                'US_CA' : true,
+                'US_NY' : true,
+                'US_FL' : true,
+            };
+        }
         readData();
     });
 }
@@ -57,7 +66,10 @@ function begin() {
     updateUSAStateRadios();
     setSmoothingDays();
     displayAll();
-    showTab('cases-tab');
+    if (CTData.countryCode === 'US')
+        showTab('hospital-tab');
+    else
+        showTab('cases-tab');
     computeLatest();
 }
 
