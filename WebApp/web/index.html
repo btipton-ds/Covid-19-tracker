@@ -21,15 +21,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <script src="population.js?v=7"></script>
         <script src="data.js?v=7"></script>
         <script src="covidReduce.js?v=7"></script>
-        <link rel="stylesheet" type="text/css" href="main.css?v=8">
+        <link rel="stylesheet" type="text/css" href="main.css?v=9">
     </head>
 
     <body onload="onLoad();">
         <div class='page-title bkg-white'>
-            Daily Tracking and Trends for<br>
-            Severe Acute Respiratory Syndrome Coronavirus 2 (SARS-CoV-2)<br>
-            Referred to as COVID-19<br>
-            USA COVID-19 Hospital Costs: <span id="USA_COST" class="usa-cost"></span> as of last complete report.
+            COVID-19 Daily Tracking and Trends<br>
+            <span class="stay-green">Stay Green to Get Clean</span><br>
+            USA COVID-19 Hospital Costs: <span id="USA_COST" class="usa-cost"></span><a href="#note_2">**</a>.
         </div>
         <div id="read-me-div" onmouseout="hideReadMe();" onclick="hideReadMe(true);" style="display: none; z-index: 1; position: fixed; background-color: lightgray; box-shadow: 2px 4px gray;">
             <ul>
@@ -179,9 +178,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             </P>
             <P>
                 <a name='note_2'>** Hospital data is processed differently and of very low reliability, not provided for countries nor by several states due to changes in reporting ordered by the US President.
-                    In cases where data has been cut off we report the last know value. Since hospitals were near capacity at the time of the cutoff, this number <i>should be</i> reasonably accurate.
-                    Hospital data is the rolling average of the number of people in the hospital due to COVID-19 divided by the state's population in millions.
-                 One obvious discrepancy is that New York state has continuing deaths, ~800 people in the hospital but zero admitted to the hospital for several weeks.</a>
+                In cases where data has been cut off we report the last known value. Since hospitals were near capacity at the time of the cutoff, this number <i>should be</i> reasonably accurate.
+                Cost data is computed by taking number of hospital patients listed as COVID-19 and multiplying by $7,000, an estimated figure form an Atlantic Magazine report.<br>
+                One obvious discrepancy is that New York state has continuing deaths, ~800 people in the hospital but zero admitted to the hospital for several weeks.</a>
             </P>
             <P>
                 <a name='note_3'>*** Not controlling COVID-19 has a cost also. Current estimates are about $6,000 to $8,000 per patient per day. Take the current number

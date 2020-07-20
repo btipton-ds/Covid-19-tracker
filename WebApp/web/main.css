@@ -16,12 +16,18 @@ body {
     font-style: italic;
 }
 
-.title, .page-title {
+.title, .page-title, .stay-green {
     font-family: TimesNewRoman;
     font-size: 14pt;
     text-align: center;
     font-weight: bold;
     width: auto;
+}
+
+.stay-green {
+    color: green;
+    font-size: 20pt;
+    font-style: italic;
 }
 
 .page-title {
@@ -114,3 +120,4 @@ body {
     font-weight: bold;
     font-size: 24pt;
 }
+
