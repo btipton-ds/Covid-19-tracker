@@ -314,7 +314,7 @@ function computeAverages(data, keys, selArr, idx, pop, result) {
         entry.cases = sumCases * scale; 
         entry.deaths = sumDeaths * scale;
         if (steps > 0)
-            entry.hospitalized = sumHospitalized / steps * scale;
+            entry.hospitalized = sumHospitalized / steps;
         else 
             entry.hospitalized = 0;
             
