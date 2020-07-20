@@ -879,6 +879,7 @@ function genGraph(dataKind) {
     drawXGrid(env, dataArr);
 
     var polylines = {};
+    var lastDataSample = {};
     var idx = 0;
     var w = dataArr.length;
     dataArr.forEach(function(data){
@@ -888,6 +889,7 @@ function genGraph(dataKind) {
             var countryCode = cd.countryCode;
             if (!polylines.hasOwnProperty(countryCode)) {
                 polylines[countryCode] = [];
+                lastDataSample[countryCode] = 0;
             }
             var points = polylines[countryCode];
             var val = 0;
@@ -896,7 +898,8 @@ function genGraph(dataKind) {
             var testDate = CTData.hospTerminated;
             if (dataKind.indexOf('hospital') !== -1) {
                 if (val <= 0.0001 && cd.date && testDate && DataAfter(cd.date, testDate)) 
-                    return;
+                    val = lastDataSample[countryCode];
+                lastDataSample[countryCode] = val;
                 val *= CTData.hospitalCostFactor;
             }
             scaledY = (val - yMin) / yHeight ;
