@@ -334,8 +334,8 @@ function computeSlopes(dataArr) {
             var caseAvg = 0, deathAvg = 0, hospitalizedAvg = 0;
             var denom = 0;
             var caseNumer = 0, deathNumer = 0, hospitalizedNumer = 0;
-            var steps = CTData.winSize;
-            if (j < CTData.winSize)
+            var steps = 7;
+            if (j < steps)
                 steps = j;
             if (steps > 0) {
                 for (var k = 0; k < steps; k++) {
