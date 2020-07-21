@@ -710,6 +710,8 @@ function computeLatest() {
         CTData.lastEntry.push(countryMap[key]);
     });
     
+    CTData.latestStatistics = countryMap;
+    
     makeSorted();
 }
 
