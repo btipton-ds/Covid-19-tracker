@@ -278,6 +278,9 @@ function daysSmoothingChanged(days) {
 function computeAverages(data, keys, selArr, idx, pop, result) {
     var scale = 7 / CTData.winSize;
     for (var i = 0; i < data.length; i++) {
+        if (data[i].date.toString().indexOf('Invalid') !== -1)
+            continue;
+
         CTData.totalHospitalDays += data[i].dailyHospitalized;
         var sumCases = 0;
         var sumDeaths = 0;
