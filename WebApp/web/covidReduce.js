@@ -44,14 +44,6 @@ async function setConutryCode() {
             document.body.style['background-image'] = 'url("back_ground_ph.jpg")';
         CTData.selected = {};
         CTData.selected[cc] = true;
-        if (cc === 'US') {
-            CTData.selected = {
-                'US_TX' : true,
-                'US_CA' : true,
-                'US_NY' : true,
-                'US_FL' : true,
-            };
-        }
         readData();
     });
 }
@@ -67,10 +59,7 @@ function begin() {
     setSmoothingDays();
     computeLatest();
     displayAll();
-    if (CTData.countryCode === 'US')
-        showTab('hospital-tab');
-    else
-        showTab('cases-tab');
+    showTab('cases-tab');
 }
 
 function displayAll() {
