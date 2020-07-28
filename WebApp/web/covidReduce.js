@@ -19,7 +19,7 @@ class BadDate {
 
 var CTData = {
     winSize: 7,
-    listSize: 20,
+    listSize: 91,
     selected: {},
     openPopups: [],
     popupTimeout: null,
@@ -705,17 +705,22 @@ function computeLatest() {
 }
 
 function leaderString(count, name, cases, caseSlope, colorize) {
+    var abbrName = name;
+    var maxLen = 40;
+    if (abbrName.length > maxLen) {
+        abbrName = abbrName.substr(0, maxLen) + '...';
+    }
     if (caseSlope < 0)
         return '<span class="leader_count">' + count + '</span>' + 
-            '<span class="leader_name">' + name + '</span>' + 
+            '<span class="leader_name">' + abbrName + '</span>' + 
             '<span class="leader_value">' + cases.toFixed(1) + '</span>' + 
-            '<span class="leader_value leader_grn">' + caseSlope.toFixed(1) + '</span>' + 
+            '<span class="leader_value leader_grn">' + caseSlope.toFixed(1) + ' / d</span>' + 
             '<br>';
     else 
         return '<span class="leader_count">' + count + '</span>' + 
-            '<span class="leader_name">' + name + '</span>' + 
+            '<span class="leader_name">' + abbrName + '</span>' + 
             '<span class="leader_value">' + cases.toFixed(1) + '</span>' + 
-            '<span class="leader_value leader_red">' + caseSlope.toFixed(1) + '</span>' + 
+            '<span class="leader_value leader_red"> +' + caseSlope.toFixed(1) + ' / d</span>' + 
             '<br>';
 }
 
