@@ -482,34 +482,34 @@ function rgbOf(r,g,b) {
 }
 
 function colorOf(idx) {
-    var max = 200;
+    var w = .85;
     var mid = 100;
     switch (idx) {
         case 0: 
-            return rgbOf(0,0,max);
+            return rgbOf(0,0,w * 255);
         case 1: 
-            return rgbOf(0,max,0);
+            return rgbOf(0,w * 255,0);
         case 2: 
-            return rgbOf(max,0,0);
+            return rgbOf(w * 255,0,0);
         case 3: 
-            return rgbOf(max,max,0);
+            return rgbOf(w * 255, w * 165,0);
         case 4: 
-            return rgbOf(max,0,max);
+            return rgbOf(w * 255,0,w * 255);
         case 5: 
-            return rgbOf(0,max,max);
+            return rgbOf(0,w * 255,w * 255);
 
         case 6: 
-            return rgbOf(max,mid,mid);
+            return rgbOf(w * 255,mid,mid);
         case 7: 
-            return rgbOf(mid,max,mid);
+            return rgbOf(w * 255, w * 165, mid);
         case 8: 
-            return rgbOf(mid,mid,max);
+            return rgbOf(mid,mid,w * 255);
         case 9: 
-            return rgbOf(max,max,mid);
+            return rgbOf(w * 255,w * 255,mid);
         case 10: 
-            return rgbOf(max,mid,max);
+            return rgbOf(w * 255,mid,w * 255);
         case 11: 
-            return rgbOf(mid,max,max);
+            return rgbOf(mid,w * 255,w * 255);
     }
     return rgbOf(0,0,0);
 }
@@ -888,7 +888,7 @@ function genGraph(dataKind) {
         env.draw.rect(env.graphWidth, redZoneHeight).attr({ 'fill': 'rgb(255,225,225)' }).move(env.xOrigin, env.graphMin - env.graphHeight);
         env.draw.rect(env.graphWidth, greenZoneHeight).attr({ 'fill': 'rgb(225,255,225)' }).move(env.xOrigin, env.graphMin - greenZoneHeight);
     } else
-        env.draw.rect(env.graphWidth, env.graphHeight).attr({ 'fill': 'rgb(235,235,235)' }).move(env.xOrigin, env.graphMax);
+        env.draw.rect(env.graphWidth, env.graphHeight).attr({ 'fill': 'rgb(250,250,255)' }).move(env.xOrigin, env.graphMax);
         
     drawYGrid(env, dataKind);
     drawXGrid(env, dataArr);

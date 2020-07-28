@@ -16,6 +16,12 @@ body {
     font-style: italic;
 }
 
+a.footnote {
+    text-decoration: none;
+    vertical-align: super;
+    font-size: smaller;
+}
+
 .title, .page-title, .stay-green {
     font-family: TimesNewRoman;
     font-size: 14pt;
