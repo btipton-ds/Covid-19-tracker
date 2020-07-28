@@ -772,15 +772,31 @@ function addSortedRev(elId, list, key) {
     }
 }
 
+function calDaysTil0 (data) {
+    if (data.cases > 0 && data.caseSlope < 0) {
+        var t = data.cases / -data.caseSlope;
+        return t;
+    }
+    else 
+        return 1e20;
+}
+
 function makeSorted() {
     var arr;
     CTData.lastEntry.sort(function(a,b){
-        if (a.caseSlope > b.caseSlope)
+        var daysTil0a = calDaysTil0(a);
+        var daysTil0b = calDaysTil0(b);
+        if (daysTil0a > daysTil0b)
+            return -1;
+        else if (daysTil0a < daysTil0b)
+            return 1;
+        else if (a.caseSlope > b.caseSlope)
             return -1;
         else if (a.caseSlope < b.caseSlope)
             return 1;
         return 0;
     });
+
     arr = [];
     CTData.lastEntry.forEach(function(entry){
         arr.push(entry);

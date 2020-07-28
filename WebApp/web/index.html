@@ -77,6 +77,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             <button class="tab-button" type="button" onclick="showTab('leaders-usa-tab')">USA Min/Max</button>
         </div>
         <div id="leaders-world-tab" style="display: none;">
+            <div class="title bkg-white">By Closure Until Zero New Cases<a href="#note_5">*****</a></div>
+            <div id="leading_world_ncrs" class="bkg-white">
+                <div id="leading_world_max_ncrs" class="leaderList">
+                </div>
+                <div id="leading_world_min_ncrs" class="leaderList">
+                </div>
+            </div>
             <div class="title bkg-white">7 Day New Cases per / million</div>
             <div id="leading_world_cases" class="bkg-white">
                 <div id="leading_world_max_cases" class="leaderList">
@@ -84,28 +91,21 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 <div id="leading_world_min_cases" class="leaderList">
                 </div>
             </div>
-            <div class="title bkg-white">7 Day New Case Rate of Change</div>
-            <div id="leading_world_ncrs" class="bkg-white">
-                <div id="leading_world_max_ncrs" class="leaderList">
-                </div>
-                <div id="leading_world_min_ncrs" class="leaderList">
-                </div>
-            </div>
         </div>
         <div id="leaders-usa-tab" style="display: none;">
+            <div class="title bkg-white">By Closure Until Zero New Cases<a href="#note_5">*****</a></div>
+            <div id="leading_usa_ncrs" class="bkg-white">
+                <div id="leading_usa_max_ncrs" class="leaderList">
+                </div>
+                <div id="leading_usa_min_ncrs" class="leaderList">
+                </div>
+            </div>
+
             <div class="title bkg-white">7 Day New Cases / million</div>
             <div id="leading_usa_cases" class="bkg-white">
                 <div id="leading_usa_max_cases" class="leaderList">
                 </div>
                 <div id="leading_usa_min_cases" class="leaderList">
-                </div>
-            </div>
-
-            <div class="title bkg-white">7 Day New Case Rate of Change</div>
-            <div id="leading_usa_ncrs" class="bkg-white">
-                <div id="leading_usa_max_ncrs" class="leaderList">
-                </div>
-                <div id="leading_usa_min_ncrs" class="leaderList">
                 </div>
             </div>
         </div>
@@ -196,6 +196,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 <a name='note_4'>**** On 20 July 2020, the NCRS slope calculation was changed to always use the last 7 days of smoothed data. Previously the slope
                 sample size was equal to the smoothing window size. I concluded that 14 or 21 day sums were sufficient for smoothing and the slope data would respond faster
                 and reflect current slope better with a fixed 7 day sample size.</a>
+            </P>
+            <P>
+                <a name='note_5'>***** On 27 July 2020, the list sorted by NCRS was replace with a list sorted by 'closing on zero'. If the NCRS is negative,
+                    the intercept of the current slope is computed. If a region has a new case rate of 100 and an NCRS = -10 <i>ideally</i> they would reach zero new cases
+                    in 10 days. Since this number is totally unpredictable in the real world, we do not display it - but we do sort by it.<br>
+                    If the NCRS is positive (there is no closure yet) we sort by that instead.<br>
+                    Regions which are closing on zero are green.<br>
+                    Regions moving away from zero are red
+                </a>
             </P>
         </div>
     </body>
