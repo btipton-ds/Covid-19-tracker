@@ -773,7 +773,9 @@ function addSortedRev(elId, list, key) {
 }
 
 function calDaysTil0 (data) {
-    if (data.cases > 0 && data.caseSlope < 0) {
+    if (data.cases === 0)
+        return 0;
+    else if (data.cases > 0 && data.caseSlope < 0) {
         var t = data.cases / -data.caseSlope;
         return t;
     }
