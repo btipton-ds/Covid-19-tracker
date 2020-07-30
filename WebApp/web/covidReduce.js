@@ -724,9 +724,7 @@ function computeLatest() {
     });
 
     dataKeys.forEach(function(key){
-        var de = dataSet[key];
-        if (de.hospit)
-        dataArr.push(de);
+        dataArr.push(dataSet[key]);
     });
 
     computeSlopes(dataArr);
