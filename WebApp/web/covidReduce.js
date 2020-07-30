@@ -29,6 +29,7 @@ var CTData = {
     ],
     hospTerminated: new Date(2020, 7 - 1, 14),
     hospitalCostFactor: (7000 / 1.0e6),
+    hospitalDays: {},
     totalHospitalDays: 0
 };
 
@@ -264,13 +265,16 @@ function daysSmoothingChanged(days) {
     }
 }
 
-function computeAverages(data, keys, selArr, idx, pop, result) {
+function computeAverages(data, countryCode, selArr, idx, pop, result) {
     var scale = 7 / CTData.winSize;
+    if (CTData.hospitalDays.hasOwnProperty(countryCode)) {
+        CTData.hospitalDays[countryCode].total = 0;
+    }
+    
     for (var i = 0; i < data.length; i++) {
         if (data[i].date.toString().indexOf('Invalid') !== -1)
             continue;
 
-        CTData.totalHospitalDays += data[i].dailyHospitalized;
         var sumCases = 0;
         var sumDeaths = 0;
         var sumHospitalized = 0;
@@ -310,6 +314,18 @@ function computeAverages(data, keys, selArr, idx, pop, result) {
         else 
             entry.hospitalized = 0;
             
+        var hospitalized = data[i].dailyHospitalized;
+        CTData.totalHospitalDays += hospitalized;
+        if (hospitalized > 0) {
+            if (!CTData.hospitalDays.hasOwnProperty(countryCode)) {
+                CTData.hospitalDays[countryCode] = {
+                    last: 0,
+                    total: 0
+                }
+            }
+            CTData.hospitalDays[countryCode].last = entry.hospitalized;
+            CTData.hospitalDays[countryCode].total += hospitalized;
+        }
     }
 }
 
@@ -381,17 +397,10 @@ function genData(dataSet, selected) {
         var pop = countryData.population;
         var data = countryData.data;
  
-        computeAverages(data, keys, selArr, idx, pop, result);
+        computeAverages(data, countryCode, selArr, idx, pop, result);
 
         idx++;
     });
-
-    if (CTData.totalHospitalDays > 0) {
-        var el = document.getElementById('USA_COST');
-        if (el.innerHTML === '') {
-            el.innerHTML = '$' + (CTData.totalHospitalDays * CTData.hospitalCostFactor / 1000).toFixed(2) + ' Billion';
-        }
-    }
 
     return result;
 }
@@ -669,12 +678,30 @@ function computeLatest() {
     dataKeys.sort(function(a, b){
         return Number(a) - Number(b);
     });
+
+    CTData.inHospital = 0;
+    var hospKeys = Object.keys(CTData.hospitalDays);
+    hospKeys.forEach(function(key){
+        CTData.inHospital += CTData.hospitalDays[key].last;
+    });
+
     dataKeys.forEach(function(key){
-        dataArr.push(dataSet[key]);
+        var de = dataSet[key];
+        if (de.hospit)
+        dataArr.push(de);
     });
 
     computeSlopes(dataArr);
     
+    if (CTData.totalHospitalDays > 0) {
+        var el = document.getElementById('USA_COST');
+        if (el.innerHTML === '') {
+            el.innerHTML = '$' + (CTData.totalHospitalDays * CTData.hospitalCostFactor / 1000).toFixed(1) + ' Billion';
+            var days = 1 / (CTData.inHospital * CTData.hospitalCostFactor / 1000);
+            el.innerHTML += ' + $1 Billion every ' + days.toFixed(1) + ' days.';
+        }
+    }
+
     var countryMap = {};
     var numFound = 0;
     // Loop over dates
@@ -934,7 +961,17 @@ function genGraph(dataKind) {
         add.tspan("Dark Sky Innovative Solutions.").fill('rgb(0,0,127)').newLine().dx(env.xOrigin);
         countryCodes.forEach(function(countryCode){
             var cd = whoData[countryCode];
-            var name = '--- ' + cd.name;        
+            var name = '--- ' + cd.name;
+            if ((dataKind.indexOf('hospital') !== -1) && CTData.hospitalDays.hasOwnProperty(countryCode)) {
+                var hd = CTData.hospitalDays[countryCode];
+                var totalCost = hd.total * CTData.hospitalCostFactor;
+                if (totalCost >= 1000) 
+                    name += ' $' + (totalCost / 1000).toFixed(1) + ' B total + ';
+                else 
+                    name += ' $' + totalCost.toFixed(1) + ' M total + ';
+                    
+                name += '$' + (hd.last * CTData.hospitalCostFactor).toFixed(1) + ' M / day';
+            }
             var color = colorOf(idx);
             add.tspan(name).fill(color).newLine().dx(env.xOrigin);
 
