@@ -43,14 +43,49 @@ async function setConutryCode() {
 
         if (cc === 'PH')
             document.body.style['background-image'] = 'url("back_ground_ph.jpg")';
-        CTData.selected = {};
         CTData.selected[cc] = true;
         readData();
     });
 }
 
+function setCountryCodesFromQuery(codes) {
+    CTData.selected = {};
+    var codes = codes.split(',');
+    codes.forEach(function (cc) {
+        CTData.selected[cc] = true;
+    });
+}
+
+function setTab(tab) {
+    if (tab === 'cases') {
+        CTData.firstTab = 'cases-tab';
+    } else if (tab === 'deaths') {
+        CTData.firstTab = 'deaths-tab';
+    } else if (tab === 'hospital') {
+        CTData.firstTab = 'hospital-tab';
+    } else if (tab === 'leaders-world') {
+        CTData.firstTab = 'leaders-world-tab';
+    } else if (tab === 'leaders-usa') {
+        CTData.firstTab = 'leaders-usa-tab';
+    }
+}
+
 function onLoad() {
-    setConutryCode();
+    var querystring = window.location.search.substr(1);
+    if (querystring.length > 0) {
+        var parts = querystring.split('&');
+        parts.forEach(function(qstr){
+            var qParts = qstr.split("=");
+            if (qParts[0] === 'cc')
+                setCountryCodesFromQuery(qParts[1]);
+            else if (qParts[0] === 'tab') {
+                setTab(qParts[1]);
+            }
+        });
+        readData();
+    } else {
+        setConutryCode();
+    }
 }
 
 function begin() {
@@ -60,7 +95,10 @@ function begin() {
     setSmoothingDays();
     computeLatest();
     displayAll();
-    showTab('cases-tab');
+    if (CTData.firstTab)
+        showTab(CTData.firstTab);
+    else
+        showTab('cases-tab');
 }
 
 function displayAll() {
