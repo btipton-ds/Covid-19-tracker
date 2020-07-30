@@ -613,6 +613,8 @@ function drawYGridLine(env, y, label, dataKind) {
         var text = env.draw.text(function(add) {
           if (dataKind.indexOf('hospital') !== -1) {
             add.tspan('$' + label + 'm/d').dy(y);
+          } else if (dataKind.indexOf('Slope') !== -1) {
+            add.tspan(label).dy(y);
           } else {
             add.tspan(label + '/m').dy(y);
           }
