@@ -101,12 +101,23 @@ a.footnote {
     color: green;
 }
 
-.leader_count, .leader_name, .leader_value {
+.leader_orange, .leader_days {
+    background-color: rgb(255,225,170);
+    
+}
+
+.leader_days {
+    width: 49pt;
+    color: green;
+    font-style: italic;
+}
+
+.leader_count, .leader_name, .leader_value, .leader_days {
     display: inline-block;
     margin-right: 3pt;
 }
 
-.leader_count, .leader_value {
+.leader_count, .leader_value, .leader_days {
     text-align: right;
 }
 
@@ -115,11 +126,11 @@ a.footnote {
 }
 
 .leader_value {
-    width: 60pt;
+    width: 50pt;
 }
 
 .leader_name {
-    width: 235pt;
+    width: 205pt;
 }
 
 .usa-cost {

@@ -18,17 +18,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="jquery-3.5.1.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
-        <script src="population.js?v=17"></script>
-        <script src="data.js?v=17"></script>
-        <script src="covidReduce.js?v=17"></script>
-        <link rel="stylesheet" type="text/css" href="main.css?v=17">
+        <script src="population.js?v=18"></script>
+        <script src="data.js?v=18"></script>
+        <script src="covidReduce.js?v=19"></script>
+        <link rel="stylesheet" type="text/css" href="main.css?v=19">
     </head>
 
     <body onload="onLoad();">
         <div class='page-title bkg-white'>
             COVID-19 Daily Tracking and Trends<br>
             <span class="stay-green">Stay Green to Get Clean</span><br>
-            USA COVID-19 Hospital Costs: <span id="USA_COST" class="usa-cost"></span><a class='footnote' href="#note_1">2</a>.<br>
+            USA COVID-19 Hospital Costs: <span id="USA_COST" class="usa-cost"></span><a class='footnote' href="#note_1">2</a><br>
             Please support <a href="https://www.gofundme.com/f/covid19tracker">COVID-19 Tracker</a> on <a href="https://www.gofundme.com/f/covid19tracker">GoFundMe</a><br>
             <span class="read-me" onmousedown="showReadMe();">Read me</span>
         </div>
@@ -77,14 +77,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             <button class="tab-button" type="button" onclick="showTab('leaders-usa-tab')">USA Min/Max</button>
         </div>
         <div id="leaders-world-tab" style="display: none;">
-            <div class="title bkg-white">By Closure Until Zero New Cases<a class='footnote' href="#note_4">4</a></div>
+            <div class="title bkg-white">Sorted By Closure Until Zero New Cases<br><span class="leader_orange">Days To Zero Is An Indicator Only</span><a class='footnote' href="#note_4">4</a></div>
             <div id="leading_world_ncrs" class="bkg-white">
                 <div id="leading_world_max_ncrs" class="leaderList">
                 </div>
                 <div id="leading_world_min_ncrs" class="leaderList">
                 </div>
             </div>
-            <div class="title bkg-white">7 Day New Cases per / million</div>
+            <div class="title bkg-white">7 Day New Cases per / million<br><span class="leader_orange">Days To Zero Is An Indicator Only</span></div>
             <div id="leading_world_cases" class="bkg-white">
                 <div id="leading_world_max_cases" class="leaderList">
                 </div>
@@ -93,7 +93,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             </div>
         </div>
         <div id="leaders-usa-tab" style="display: none;">
-            <div class="title bkg-white">By Closure Until Zero New Cases<a class='footnote' href="#note_4">4</a></div>
+            <div class="title bkg-white">Sorted By Closure Until Zero New Cases<br><span class="leader_orange">Days To Zero Is An Indicator Only</span><a class='footnote' href="#note_4">4</a></div>
             <div id="leading_usa_ncrs" class="bkg-white">
                 <div id="leading_usa_max_ncrs" class="leaderList">
                 </div>
@@ -101,7 +101,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                 </div>
             </div>
 
-            <div class="title bkg-white">7 Day New Cases / million</div>
+            <div class="title bkg-white">7 Day New Cases / million<br><span class="leader_orange">Days To Zero Is An Indicator Only</span><a class='footnote' href="#note_4">4</a></div>
             <div id="leading_usa_cases" class="bkg-white">
                 <div id="leading_usa_max_cases" class="leaderList">
                 </div>
@@ -197,12 +197,24 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                     and reflect current slope better with a fixed 7 day sample size.</a>
                 </li>
                 <li>
-                    <a name='note_4'>On 27 July 2020, the list sorted by NCRS was replace with a list sorted by 'closing on zero'. If the NCRS is negative,
+                    <a name='note_4'>
+                        On 3 August 2020, days until zero were added if the value was less than one year. This value is displayed with 
+                            <span class="leader_orange">an orange background</span> to bring attention to the fact that <b>IT IS NOT A PREDICTION! If</b> this rate 
+                            could be maintained, the region would reach zero new cases/week in this number of days. <span class="leader_orange">This is virtually 
+                                impossible</span> and is only provided as a guide!<br>
+                            If a region uses this guide to control their new case rate, it will inform them of their progress in reaching and maintaining zero cases.<br>
+                            The quality of the value is poor at best. It is based on data reported to <a href="https://covid19.who.int/">WHO</a> and 
+                            <a href="https://covidtracking.com/">The Covid Tracking Project</a>. To have greater reliability, a region must test more thoroughly and report data 
+                            accurately to these data centers. <a href="https://covidtracking.com/">The Covid Tracking Project</a> gets much of it's data from USA CDC.<br>
+                            Dark Sky Innovative Solutions provides this data as a public service and states that it's quality is doubtful. However, we firmly believe it
+                            is the best indicator available for tracking containment and control of COVID-19.<br>
+                            <br>
+                        On 27 July 2020, the list sorted by NCRS was replace with a list sorted by 'closing on zero'. If the NCRS is negative,
                         the intercept of the current slope is computed. If a region has a new case rate of 100 and an NCRS = -10 <i>ideally</i> they would reach zero new cases
                         in 10 days. Since this number is totally unpredictable in the real world, we do not display it - but we do sort by it.<br>
                         If the NCRS is positive (there is no closure yet) we sort by that instead.<br>
                         Regions which are closing on zero are green.<br>
-                        Regions moving away from zero are red
+                        Regions moving away from zero are red.
                     </a>
                 </li>
             </ol>
