@@ -804,7 +804,7 @@ function addSorted(elId, list, key) {
 
     var numToDisplay = isUsa ? 26 : CTData.listSize;
     var el = document.getElementById(elId);
-    el.innerHTML += '<span class="leader-title">Highest</span><br>';
+    el.innerHTML = '<span class="leader-title">Highest</span><br>';
     count = 1;
     for (i = 0; i < list.length; i++) {
         ce = list[i];
@@ -828,7 +828,7 @@ function addSortedRev(elId, list, key) {
     var numToDisplay = isUsa ? 26 : CTData.listSize;
 
     var el = document.getElementById(elId);
-    el.innerHTML += '<span class="leader-title">Lowest</span><br>';
+    el.innerHTML = '<span class="leader-title">Lowest</span><br>';
     count = 1;
     for (i = list.length - 1; i >= 0; i--) {
         ce = list[i];
