@@ -18,10 +18,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="jquery-3.5.1.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
-        <script src="population.js?v=20"></script>
-        <script src="data.js?v=20"></script>
-        <script src="covidReduce.js?v=20"></script>
-        <link rel="stylesheet" type="text/css" href="main.css?v=20">
+        <script src="population.js?v=21"></script>
+        <script src="data.js?v=21"></script>
+        <script src="covidReduce.js?v=21"></script>
+        <link rel="stylesheet" type="text/css" href="main.css?v=21">
     </head>
 
     <body onload="onLoad();">
@@ -80,15 +80,19 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             <div class="title bkg-white">Sorted By Closure Until Zero New Cases<br><span class="leader_orange">Days To Zero Is An Indicator Only</span><a class='footnote' href="#note_4">4</a></div>
             <div id="leading_world_ncrs" class="bkg-white">
                 <div id="leading_world_max_ncrs" class="leaderList">
+                    <span class="loading-msg">Data is loading, please wait. This normally takes less than one minute and only happens once each time the page loads.</span>
                 </div>
                 <div id="leading_world_min_ncrs" class="leaderList">
+                    <span class="loading-msg">Data is loading, please wait. This normally takes less than one minute and only happens once each time the page loads.</span>
                 </div>
             </div>
             <div class="title bkg-white">7 Day New Cases per / million<br><span class="leader_orange">Days To Zero Is An Indicator Only</span></div>
             <div id="leading_world_cases" class="bkg-white">
                 <div id="leading_world_max_cases" class="leaderList">
+                    <span class="loading-msg">Data is loading, please wait. This normally takes less than one minute and only happens once each time the page loads.</span>
                 </div>
                 <div id="leading_world_min_cases" class="leaderList">
+                    <span class="loading-msg">Data is loading, please wait. This normally takes less than one minute and only happens once each time the page loads.</span>
                 </div>
             </div>
         </div>
@@ -96,52 +100,62 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             <div class="title bkg-white">Sorted By Closure Until Zero New Cases<br><span class="leader_orange">Days To Zero Is An Indicator Only</span><a class='footnote' href="#note_4">4</a></div>
             <div id="leading_usa_ncrs" class="bkg-white">
                 <div id="leading_usa_max_ncrs" class="leaderList">
+                    <span class="loading-msg">Data is loading, please wait. This normally takes less than one minute and only happens once each time the page loads.</span>
                 </div>
                 <div id="leading_usa_min_ncrs" class="leaderList">
+                    <span class="loading-msg">Data is loading, please wait. This normally takes less than one minute and only happens once each time the page loads.</span>
                 </div>
             </div>
 
             <div class="title bkg-white">7 Day New Cases / million<br><span class="leader_orange">Days To Zero Is An Indicator Only</span><a class='footnote' href="#note_4">4</a></div>
             <div id="leading_usa_cases" class="bkg-white">
                 <div id="leading_usa_max_cases" class="leaderList">
+                    <span class="loading-msg">Data is loading, please wait. This normally takes less than one minute and only happens once each time the page loads.</span>
                 </div>
                 <div id="leading_usa_min_cases" class="leaderList">
+                    <span class="loading-msg">Data is loading, please wait. This normally takes less than one minute and only happens once each time the page loads.</span>
                 </div>
             </div>
         </div>
-        <div id="cases-tab" style="display: none;">
+        <div id="cases-tab">
             <div class="graph bkg-white">
                 <div class="title">COVID-19 Normalized Weekly Cases</div>
-                <div id="cases">            
+                <div id="cases">
+                    <span class="loading-msg">Data is loading, please wait. This normally takes less than one minute and only happens once each time the page loads.</span>
                 </div>
             </div>
             <div class="graph bkg-white">
                 <div class="title">COVID-19 NCRS<a class='footnote' href="#note_3">3</a></div>
-                <div id="caseSlope">            
+                <div id="caseSlope">
+                    <span class="loading-msg">Data is loading, please wait. This normally takes less than one minute and only happens once each time the page loads.</span>
                 </div>
             </div>
         </div>
         <div id="deaths-tab" style="display: none;">
             <div class="graph bkg-white">
                 <div class="title">COVID-19 Normalized Weekly Deaths</div>
-                <div id="deaths">            
+                <div id="deaths">
+                    <span class="loading-msg">Data is loading, please wait. This normally takes less than one minute and only happens once each time the page loads.</span>
                 </div>
             </div>
             <div class="graph bkg-white">
                 <div class="title">COVID-19 NDRS<a class='footnote' href="#note_3">3</a></div>
-                <div id="deathSlope">            
+                <div id="deathSlope">
+                    <span class="loading-msg">Data is loading, please wait. This normally takes less than one minute and only happens once each time the page loads.</span>
                 </div>
             </div>
         </div>
         <div id="hospital-tab" style="display: none;">
             <div class="graph bkg-white">
                 <div class="title">COVID-19 Daily Cost of Treatment<a class='footnote' href="#note_1">1</a><br>Current cost estimates are about $7,000/day per patient.<a class='footnote' href="#note_2">2</a></div>
-                <div id="hospitalized">            
+                <div id="hospitalized">
+                    <span class="loading-msg">Data is loading, please wait. This normally takes less than one minute and only happens once each time the page loads.</span>
                 </div>
             </div>
             <div class="graph bkg-white"  style="display: none;">
                 <div class="title">COVID-19 Daily Cost of Treatment Slope</div>
-                <div id="hospitalizedSlope">            
+                <div id="hospitalizedSlope">
+                    <span class="loading-msg">Data is loading, please wait. This normally takes less than one minute and only happens once each time the page loads.</span>
                 </div>
             </div>
         </div>

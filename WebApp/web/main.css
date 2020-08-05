@@ -144,3 +144,10 @@ a.footnote {
     color: blue;
     cursor: pointer;
 }
+
+.loading-msg {
+    background-color: lightblue;
+    cursor: wait;
+    display: inline-block;
+    height: 400px;
+}
