@@ -32,22 +32,22 @@ function readData() {
     }).then(function (data){
         processWHOData(data);
         readUSAData();
-        begin();
+        begin(true);
     });
     
 }
 
 var gWorldDataMap = {};
 
-async function readUSAData() {
-  await $.ajax('daily.json', 
+function readUSAData() {
+  $.ajax('daily.json', 
     {
         mimeType : '"text/json"',
         dataType :'json'
     }).then(function (data){
         var allData = processUSAData(data);
         fixObviousErrors(allData);
-        begin();
+        begin(false);
     });
     
 }

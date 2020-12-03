@@ -18,8 +18,8 @@ class BadDate {
 }
 
 var CTData = {
-    winSize: 7,
-    listSize: 91,
+    winSize: 14,
+    numCountries: 268,
     selected: {},
     openPopups: [],
     popupTimeout: null,
@@ -88,17 +88,23 @@ function onLoad() {
     }
 }
 
-function begin() {
-    CTData.winSize = 7;
-    updateCountryRadios();
-    updateUSAStateRadios();
-    setSmoothingDays();
+function begin(isCountries) {
+    if (isCountries) {
+        updateCountryRadios();
+        CTData.winSize = 21;
+        setSmoothingDays();
+    } else {
+        updateUSAStateRadios();
+    }
     computeLatest();
     displayAll();
-    if (CTData.firstTab)
-        showTab(CTData.firstTab);
-    else
-        showTab('cases-tab');
+
+    if (isCountries) {
+        if (CTData.firstTab)
+            showTab(CTData.firstTab);
+        else
+            showTab('cases-tab');
+    }
 }
 
 function displayAll() {
@@ -274,30 +280,33 @@ function onChanged(el) {
 }
 
 function setSmoothingDays() {
+    document.getElementById('days_7').checked = false;
+    document.getElementById('days_14').checked = false;
+    document.getElementById('days_21').checked = false;
+    document.getElementById('days_28').checked = false;
     switch (CTData.winSize) {
         case 7: 
             document.getElementById('days_7').checked = true;
-            document.getElementById('days_14').checked = false;
-            document.getElementById('days_21').checked = false;
             break;
         case 14: 
-            document.getElementById('days_7').checked = false;
             document.getElementById('days_14').checked = true;
-            document.getElementById('days_21').checked = false;
             break;
         case 21: 
-            document.getElementById('days_7').checked = false;
-            document.getElementById('days_14').checked = false;
             document.getElementById('days_21').checked = true;
             break;
+        case 28: 
+            document.getElementById('days_28').checked = true;
+            break;
         default:
+            document.getElementById('days_28').checked = true;
             break;
     }    
 }
 
 function daysSmoothingChanged(days) {
-    if (days != CTData.winSize) {
+    if (days !== CTData.winSize) {
         CTData.winSize = days;
+        computeLatest();
         setSmoothingDays();
         displayAll();
     }
@@ -380,7 +389,7 @@ function computeSlopes(dataArr) {
             var caseAvg = 0, deathAvg = 0, hospitalizedAvg = 0;
             var denom = 0;
             var caseNumer = 0, deathNumer = 0, hospitalizedNumer = 0;
-            var steps = 7;
+            var steps = CTData.winSize;
             if (j < steps)
                 steps = j;
             if (steps > 0) {
@@ -703,6 +712,7 @@ function drawXGrid(env, dataArr) {
 }
 
 function computeLatest() {
+    CTData.lastEntry = [];
     var whoData = getData();
     var selected = [];
     var allKeys = Object.keys(whoData);
@@ -797,12 +807,27 @@ function leaderString(count, name, cases, caseSlope, colorize) {
     }
 }
 
+function countCountries(list) {
+    var cc, i, count = 0;
+    for (i = 0; i < list.length; i++) {
+        cc = list[i].countryCode.trim();
+        if (cc !== "" && cc.indexOf('US_') === -1) {
+            count++;
+        }
+    }
+    return count;
+}
+
 function addSorted(elId, list, key) {
     var whoData = getData();
     var i, count, ce, cd;
     var isUsa = elId.indexOf('_usa_') !== -1;
 
-    var numToDisplay = isUsa ? 26 : CTData.listSize;
+    var numCountries = countCountries(list);
+    if (numCountries % 2 === 1)
+        numCountries += 1;
+    numCountries /= 2;
+    var numToDisplay = isUsa ? 26 : numCountries;
     var el = document.getElementById(elId);
     el.innerHTML = '<span class="leader-title">Highest</span><br>';
     count = 1;
@@ -810,13 +835,11 @@ function addSorted(elId, list, key) {
         ce = list[i];
         var val = ce[key];
         if ((isUsa && (ce.countryCode.indexOf('US_') === 0)) || (!isUsa && (ce.countryCode.indexOf('US_') !== 0))) {
-            if (val !== 0) {
-                cd = whoData[ce.countryCode];
-                el.innerHTML += leaderString(count, cd.name, ce.cases, ce.caseSlope);
-                count++;
-                if (count > numToDisplay)
-                    break;
-            }
+            cd = whoData[ce.countryCode];
+            el.innerHTML += leaderString(count, cd.name, ce.cases, ce.caseSlope);
+            count++;
+            if (count > numToDisplay)
+                break;
         }
     }
 }
@@ -825,22 +848,24 @@ function addSortedRev(elId, list, key) {
     var whoData = getData();
     var i, count, ce, cd;
     var isUsa = elId.indexOf('_usa_') !== -1;
-    var numToDisplay = isUsa ? 26 : CTData.listSize;
+
+    var numCountries = countCountries(list);
+    if (numCountries % 2 === 1)
+        numCountries -= 1;
+    numCountries /= 2;
+    var numToDisplay = isUsa ? 26 : numCountries;
 
     var el = document.getElementById(elId);
     el.innerHTML = '<span class="leader-title">Lowest</span><br>';
     count = 1;
     for (i = list.length - 1; i >= 0; i--) {
         ce = list[i];
-        var val = ce[key];
         if ((isUsa && (ce.countryCode.indexOf('US_') === 0)) || (!isUsa && (ce.countryCode.indexOf('US_') !== 0))) {
-            if (val !== 0) {
-                cd = whoData[ce.countryCode];
-                el.innerHTML += leaderString(count, cd.name, ce.cases, ce.caseSlope);
-                count++;
-                if (count > numToDisplay)
-                    break;
-            }
+            cd = whoData[ce.countryCode];
+            el.innerHTML += leaderString(count, cd.name, ce.cases, ce.caseSlope);
+            count++;
+            if (count > numToDisplay)
+                break;
         }
     }
 }
