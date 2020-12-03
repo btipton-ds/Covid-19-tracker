@@ -2,3 +2,5 @@
 /WebApp/build/
 /WebApp/dist/
 *.csv
+*.json
+*.log

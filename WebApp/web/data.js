@@ -32,7 +32,7 @@ function readData() {
     }).then(function (data){
         processWHOData(data);
         readUSAData();
-//        begin();
+        begin();
     });
     
 }
@@ -40,7 +40,7 @@ function readData() {
 var gWorldDataMap = {};
 
 async function readUSAData() {
-  await $.ajax('https://covidtracking.com/api/v1/states/daily.json', 
+  await $.ajax('daily.json', 
     {
         mimeType : '"text/json"',
         dataType :'json'
