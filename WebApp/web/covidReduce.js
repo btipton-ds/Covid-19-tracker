@@ -571,7 +571,11 @@ function colorOf(idx) {
 }
 
 function calRoundedHeight0(val) {
-    if (val > 5000)
+    if (val > 50000)
+        return Math.round((val + 9999) / 10000) * 10000;
+    else if (val > 10000)
+        return Math.round((val + 1999) / 2000) * 2000;
+    else if (val > 5000)
         return Math.round((val + 999) / 1000) * 1000;
     else if (val > 2000)
         return Math.round((val + 499) / 500) * 500;
@@ -633,18 +637,28 @@ function drawYGridLine(env, y, label, dataKind) {
     });
 }
 
+function pow(yTS, x) {
+    for (var i = 0; i < 10; i++) {
+        if (yTS === x)
+            return true;
+        x = x * 10;
+    }
+    return false;
+}
+
 function drawYGrid(env, dataKind) {
     var yMinMAx = calRoundedHeight(env.minMax[dataKind]);
     var yRange = yMinMAx.max - yMinMAx.min;
     var yTS = 0.001;
 
     var numTicks = Math.round(yRange / yTS);
+    
     while (numTicks > 10) {
-        if (yTS === .001 || yTS === 0.01 || yTS === 0.1 || yTS === 1 || yTS === 10 || yTS === 100)
+        if (pow(yTS, .001))
             yTS *= 2;
-        else if (yTS === .002 || yTS === 0.02 || yTS === 0.2 || yTS === 2 || yTS === 20 || yTS === 200)
+        else if (pow(yTS, .002))
             yTS *= 2.5;
-        else if (yTS === .005 || yTS === 0.05 || yTS === 0.5 || yTS === 5 || yTS === 50 || yTS === 500)
+        else if (pow(yTS, .005))
             yTS *= 2;
         numTicks = Math.round(yRange / yTS);
     }
