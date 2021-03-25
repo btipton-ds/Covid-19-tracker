@@ -28,8 +28,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <div class='page-title bkg-white'>
             COVID-19 Daily Tracking and Trends<br>
             <span class="stay-green">Stay Green to Get Clean</span><br>
+            <!--
             USA COVID-19 Hospital Costs: <span id="USA_COST" class="usa-cost"></span><a class='footnote' href="#note_1">2</a><br>
             Please support <a href="https://www.gofundme.com/f/covid19tracker">COVID-19 Tracker</a> on <a href="https://www.gofundme.com/f/covid19tracker">GoFundMe</a><br>
+            -->
             <span class="read-me" onmousedown="showReadMe();">Read me</span>
         </div>
         <div id="read-me-div" onclick="hideReadMe(true);" style="display: none; z-index: 1; position: fixed; background-color: lightgray; box-shadow: 2px 4px gray;">
@@ -73,7 +75,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <div class="bkg-white">
             <span class="picker">View:</span><button class="tab-button" type="button" onclick="showTab('cases-tab')">Cases</button>
             <button class="tab-button" type="button" onclick="showTab('deaths-tab')">Deaths</button>
+            <!--
             <button class="tab-button" type="button" onclick="showTab('hospital-tab')" >US Hospital $/day</button>
+            -->
             <button class="tab-button" type="button" onclick="showTab('leaders-world-tab')">World Min/Max</button>
             <button class="tab-button" type="button" onclick="showTab('leaders-usa-tab')">USA Min/Max</button>
         </div>
@@ -231,6 +235,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                         Regions which are closing on zero are green.<br>
                         Regions moving away from zero are red.
                     </a>
+                </li>
+                <li>
+                    On 25 March the data source for US states was changed from Covid Tracking Project to US CDC. Hospitalization data is not available at this time.
                 </li>
             </ol>
         </div>

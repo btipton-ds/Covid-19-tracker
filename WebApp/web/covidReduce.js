@@ -164,6 +164,7 @@ function updateCountryRadios() {
 function updateUSAStateRadios() {
     var dataSet = getData();
     var keys = Object.keys(dataSet);
+    keys.sort();
     
     var el = document.getElementById('usa_states');
     el.innerHTML = '<span class="picker">Pick US States: </span>';

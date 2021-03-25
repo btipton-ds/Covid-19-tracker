@@ -31,7 +31,8 @@ function readData() {
         dataType :'text'
     }).then(function (data){
         processWHOData(data);
-        readUSAData();
+        //readUSAData();
+        readUSACDCData();
         begin(true);
     });
     
@@ -46,6 +47,19 @@ function readUSAData() {
         dataType :'json'
     }).then(function (data){
         var allData = processUSAData(data);
+        fixObviousErrors(allData);
+        begin(false);
+    });
+    
+}
+
+function readUSACDCData() {
+  $.ajax('daily_cdc.csv', 
+    {
+        mimeType : '"text/csv"',
+        dataType :'text'
+    }).then(function (data){
+        var allData = processUSACDCData(data);
         fixObviousErrors(allData);
         begin(false);
     });
@@ -244,5 +258,73 @@ function processUSAData(data) {
         });
     });
 
+    return gWorldDataMap;
+}
+
+function processUSACDCData(inputData) {
+    var data = inputData.split('\n');
+    var header = data[0].split(',');
+    console.log(header);
+    data.shift();
+
+    data.forEach(function(row){
+        var rowData = row.split(',');
+        var dateArr = rowData[0].split('/');
+        var stateData = {
+            'date' : new Date(dateArr[2], dateArr[0] - 1, dateArr[1]),
+            'state' : rowData[1],
+
+            'totCases' : (rowData[2] === "") ? 0 : parseInt(rowData[2]),
+            'totDeaths' : (rowData[7] === "") ? 0 : parseInt(rowData[7]),
+
+            'positiveIncrease' : (rowData[5] === "") ? 0 : parseInt(rowData[5]),
+            'deathIncrease' : (rowData[10] === "") ? 0 : parseInt(rowData[10]),
+            'hospitalizedCurrently' : 0,
+        };
+        if (!usaPopulationLUT.hasOwnProperty(stateData.state)) {
+            return;
+        }
+        var countryCode = 'US_' + stateData.state;
+        var dateNum = stateData.date;
+        var year = Math.trunc(dateNum / 10000);
+        dateNum = dateNum - (year * 10000);
+        var month = Math.trunc(dateNum / 100);
+        var day = dateNum - (month * 100);
+
+        if (!gWorldDataMap.hasOwnProperty(countryCode)) {
+            var pop = usaPopulationLUT[stateData.state].pop / 1.0e6;
+            
+            var data = {
+                name: usaPopulationLUT[stateData.state].name,
+                population: pop, 
+                region: 'US', 
+                data: []
+            };
+            gWorldDataMap[countryCode] = data;
+        }
+
+        var entry = {
+            date: stateData.date,
+            dailyCases: stateData.positiveIncrease,
+            dailyDeaths: stateData.deathIncrease,
+            dailyHospitalized: stateData.hospitalizedCurrently
+        };
+
+        gWorldDataMap[countryCode].data.push(entry);
+/* Data screeing test DO NOT delete
+        if (stateData.state === 'TN') {
+            console.log(entry.date + ' ' + stateData.state + ': ' + stateData.positiveIncrease);
+        }         
+ */
+    });
+    
+    var keys = Object.keys(gWorldDataMap);
+    keys.forEach(function(key){
+        var state = gWorldDataMap[key];
+        state.data.sort(function(a, b){
+            return a.date - b.date;
+        });
+    });
+    
     return gWorldDataMap;
 }
